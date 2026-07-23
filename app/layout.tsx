@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { BrandMark, BRAND_NAME } from "@/components/brand-mark";
+import { auth } from "@/lib/auth";
+import { isAdminRole } from "@/lib/admin/roles";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +41,10 @@ export default function RootLayout({
   );
 }
 
-function SiteHeader() {
+async function SiteHeader() {
+  const session = await auth();
+  const showAdmin = isAdminRole(session?.user?.role, session?.user?.email);
+
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-background)_82%,transparent)] backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
@@ -59,6 +64,11 @@ function SiteHeader() {
           <Link href="/dashboard" className="hover:text-[var(--color-foreground)]">
             控制台
           </Link>
+          {showAdmin ? (
+            <Link href="/admin" className="hover:text-[var(--color-primary)]">
+              后台
+            </Link>
+          ) : null}
           <Link
             href="/login"
             className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[var(--color-foreground)] hover:border-[var(--color-primary)]"

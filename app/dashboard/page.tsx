@@ -6,6 +6,7 @@ import { planFor } from "@/lib/plans";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScanForm } from "@/components/scan-form";
+import { NotificationSettings } from "@/components/notification-settings";
 import { formatDate } from "@/lib/utils";
 import { AppWindow, Bell, ShieldCheck, ArrowRight } from "lucide-react";
 
@@ -105,6 +106,18 @@ export default async function Dashboard() {
           })}
         </div>
       )}
+
+      <Card className="mt-8">
+        <CardContent className="p-5">
+          <h2 className="mb-1 flex items-center gap-2 text-sm font-medium">
+            <Bell size={14} /> 邮件通知偏好
+          </h2>
+          <p className="mb-4 text-xs text-[var(--color-muted)]">
+            控制告警、周报与体检完成邮件。魔法链接登录邮件始终发送。
+          </p>
+          <NotificationSettings />
+        </CardContent>
+      </Card>
 
       <div className="mt-8 flex items-center gap-2 text-xs text-[var(--color-muted)]">
         <ShieldCheck size={14} /> 仅提供检测工具，非安全担保方 · 默认只告警不阻断

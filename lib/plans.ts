@@ -3,7 +3,10 @@ import type { Tier } from "@prisma/client";
 export interface Plan {
   tier: Tier;
   name: string;
+  /** 原价展示（划线） */
   price: string;
+  /** 限时价；付费档当前统一限时 $0 */
+  promoPrice?: string;
   priceNote: string;
   appLimit: number;
   retentionDays: number;
@@ -11,6 +14,9 @@ export interface Plan {
   features: string[];
   highlight?: boolean;
 }
+
+/** 早鸟限时：付费档标原价，成交价暂为 $0 */
+export const PROMO_LABEL = "限时早鸟";
 
 export const PLANS: Plan[] = [
   {
@@ -33,6 +39,7 @@ export const PLANS: Plan[] = [
     tier: "INDIE",
     name: "Indie",
     price: "$19",
+    promoPrice: "$0",
     priceNote: "每月",
     appLimit: 3,
     retentionDays: 30,
@@ -49,6 +56,7 @@ export const PLANS: Plan[] = [
     tier: "TEAM",
     name: "Team",
     price: "$99",
+    promoPrice: "$0",
     priceNote: "每月",
     appLimit: 15,
     retentionDays: 365,
@@ -66,6 +74,7 @@ export const PLANS: Plan[] = [
     tier: "ENTERPRISE",
     name: "Enterprise",
     price: "$2,000+",
+    promoPrice: "$0",
     priceNote: "每月起",
     appLimit: 9999,
     retentionDays: 3650,

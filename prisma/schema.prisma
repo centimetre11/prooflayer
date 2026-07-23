@@ -62,6 +62,26 @@ enum EvidenceType {
   INCIDENT // incident timeline record
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum EmailKind {
+  MAGIC_LINK
+  ALERT
+  WEEKLY_DIGEST
+  SCAN_COMPLETE
+  SYSTEM
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  FAILED
+  SKIPPED
+}
+
 // ---------------------------------------------------------------------------
 // Auth.js models
 // ---------------------------------------------------------------------------
@@ -72,12 +92,15 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  role          UserRole  @default(USER)
   createdAt     DateTime  @default(now())
 
-  accounts     Account[]
-  sessions     Session[]
-  apps         App[]
-  subscription Subscription?
+  accounts               Account[]
+  sessions               Session[]
+  apps                   App[]
+  subscription           Subscription?
+  notificationPreference NotificationPreference?
+  emailDeliveries        EmailDelivery[]
 }
 
 model Account {
@@ -278,4 +301,41 @@ model AuditCredential {
   createdAt DateTime @default(now())
 
   app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+}
+
+// Per-user notification channel preferences (email first; Slack later).
+model NotificationPreference {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  emailAlerts   Boolean   @default(true)
+  weeklyDigest  Boolean   @default(true)
+  scanComplete  Boolean   @default(false)
+  quietUntil    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Durable delivery log for every outbound email (ops + debugging).
+model EmailDelivery {
+  id           String      @id @default(cuid())
+  userId       String?
+  to           String
+  kind         EmailKind
+  subject      String
+  status       EmailStatus @default(QUEUED)
+  providerId   String?
+  error        String?
+  meta         Json?
+  relatedAppId String?
+  createdAt    DateTime    @default(now())
+  sentAt       DateTime?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([kind])
+  @@index([createdAt])
 }

@@ -53,13 +53,27 @@ export async function runMonitoringForApp(appId: string): Promise<AppMonitorResu
     if (opened.length > 0 && app.user?.email) {
       const toNotify = await throttleNotifications(app.id, opened);
       if (toNotify.length > 0) {
+        const base = (process.env.APP_URL ?? "http://localhost:3000").replace(
+          /\/$/,
+          ""
+        );
         const mail = alertEmail(
           app.name,
-          toNotify.map((a) => ({ title: a.title, severity: a.severity }))
+          toNotify.map((a) => ({ title: a.title, severity: a.severity })),
+          `${base}/dashboard/apps/${app.id}`
         );
-        await sendEmail({ to: app.user.email, ...mail });
-        await markNotified(toNotify.map((a) => a.id));
-        notified = toNotify.length;
+        const res = await sendEmail({
+          to: app.user.email,
+          userId: app.user.id,
+          relatedAppId: app.id,
+          kind: "ALERT",
+          ...mail,
+          meta: { alertIds: toNotify.map((a) => a.id) },
+        });
+        if (res.status === "SENT") {
+          await markNotified(toNotify.map((a) => a.id));
+          notified = toNotify.length;
+        }
       }
     }
 
