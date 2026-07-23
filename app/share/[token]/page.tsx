@@ -1,0 +1,60 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { ReportView } from "@/components/report-view";
+import { Card, CardContent } from "@/components/ui/card";
+import type { FindingView } from "@/components/finding-card";
+import type { Severity } from "@/lib/types";
+import { ShieldCheck } from "lucide-react";
+
+export const runtime = "nodejs";
+
+export default async function SharedReport({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  const { token } = await params;
+  const link = await prisma.shareLink.findUnique({
+    where: { token },
+    include: { scan: { include: { findings: true } } },
+  });
+  if (!link) notFound();
+  const scan = link.scan;
+
+  const findings: FindingView[] = scan.findings.map((f) => ({
+    ruleId: f.ruleId,
+    category: f.category,
+    severity: f.severity as Severity,
+    title: f.title,
+    description: f.description,
+    confidence: f.confidence,
+    evidence: (f.evidence ?? {}) as Record<string, unknown>,
+    remediation: (f.remediation ?? {}) as FindingView["remediation"],
+  }));
+
+  return (
+    <div className="mx-auto max-w-4xl px-5 py-10">
+      <Card className="mb-6">
+        <CardContent className="flex items-center gap-3 p-4 text-sm text-[var(--color-muted)]">
+          <ShieldCheck size={18} className="text-[var(--color-accent)]" />
+          这是一份只读的安全体检报告，由
+          <Link href="/" className="text-[var(--color-primary)] hover:underline">
+            Prooflayer
+          </Link>
+          生成。
+        </CardContent>
+      </Card>
+      <ReportView
+        data={{
+          url: scan.url,
+          createdAt: scan.createdAt,
+          rulesetVersion: scan.rulesetVersion,
+          score: scan.score,
+          supabaseUrl: (scan.meta as { supabaseUrl?: string } | null)?.supabaseUrl ?? null,
+          findings,
+        }}
+      />
+    </div>
+  );
+}

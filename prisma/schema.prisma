@@ -1,0 +1,281 @@
+// Prooflayer — Vibe 应用治理套件 data model
+// Governance / compliance layer for AI-generated (vibe coded) apps.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum ScanStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+
+enum ScanKind {
+  EXTERNAL // zero-touch external scan (module 1)
+  DEEP // semi-touch deep audit via Supabase credentials (module 2)
+  MONITOR // daily monitoring re-scan (module 3)
+}
+
+enum FindingStatus {
+  OPEN
+  ACKNOWLEDGED
+  FIXED
+  VERIFIED
+}
+
+enum AlertState {
+  OPEN
+  ACK
+  RESOLVED
+}
+
+enum Tier {
+  FREE
+  INDIE
+  TEAM
+  ENTERPRISE
+}
+
+enum EvidenceType {
+  BASELINE // full scan snapshot
+  REMEDIATION // a finding state transition
+  HEARTBEAT // monitoring continuity proof
+  INCIDENT // incident timeline record
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js models
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+
+  accounts     Account[]
+  sessions     Session[]
+  apps         App[]
+  subscription Subscription?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Domain models
+// ---------------------------------------------------------------------------
+
+model App {
+  id                String   @id @default(cuid())
+  userId            String?
+  name              String
+  url               String
+  projectRef        String? // supabase project ref, if detected/provided
+  supabaseUrl       String?
+  monitoringEnabled Boolean  @default(false)
+  lastScanAt        DateTime?
+  createdAt         DateTime @default(now())
+
+  user            User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  scans           Scan[]
+  alerts          Alert[]
+  evidenceRecords EvidenceRecord[]
+  auditCredential AuditCredential?
+
+  @@index([userId])
+}
+
+model Scan {
+  id             String     @id @default(cuid())
+  appId          String?
+  url            String
+  kind           ScanKind   @default(EXTERNAL)
+  status         ScanStatus @default(QUEUED)
+  rulesetVersion String?
+  score          Int? // 0-100, higher = safer
+  riskCounts     Json? // { critical, high, medium, low, info }
+  meta           Json? // assets discovered, supabase url, timings, errors
+  error          String?
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  createdAt      DateTime   @default(now())
+
+  app      App?          @relation(fields: [appId], references: [id], onDelete: Cascade)
+  findings ScanFinding[]
+  shares   ShareLink[]
+
+  @@index([appId])
+  @@index([status])
+}
+
+model ScanFinding {
+  id          String        @id @default(cuid())
+  scanId      String
+  ruleId      String
+  category    String
+  severity    Severity
+  title       String
+  description String
+  evidence    Json? // redacted evidence: matched location, decoded jwt role, etc.
+  remediation Json? // { summary, steps[], consoleePath }
+  fingerprint String // stable across scans for the same underlying issue
+  confidence  Int           @default(80) // 0-100
+  status      FindingStatus @default(OPEN)
+  createdAt   DateTime      @default(now())
+
+  scan Scan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([scanId])
+  @@index([fingerprint])
+}
+
+// Versioned rule catalog — a snapshot of the ruleset used, so historical
+// reports remain reproducible even as rules evolve.
+model Rule {
+  id          String   @id @default(cuid())
+  ruleId      String
+  version     String
+  category    String
+  severity    Severity
+  matcherType String // regex | entropy | jwt_decode | http_probe
+  title       String
+  description String
+  payload     Json
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@unique([ruleId, version])
+}
+
+model Alert {
+  id             String     @id @default(cuid())
+  appId          String
+  ruleId         String
+  fingerprint    String
+  severity       Severity
+  title          String
+  detail         String?
+  state          AlertState @default(OPEN)
+  openedAt       DateTime   @default(now())
+  ackedAt        DateTime?
+  resolvedAt     DateTime?
+  lastNotifiedAt DateTime?
+  notifyCount    Int        @default(0)
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, fingerprint, state])
+  @@index([appId])
+}
+
+// Tamper-evident evidence chain (module 3 — the moat).
+// chain_hash = sha256(prev_hash || payload_hash || created_at)
+model EvidenceRecord {
+  id          String       @id @default(cuid())
+  appId       String
+  seq         Int
+  type        EvidenceType
+  payload     Json
+  payloadHash String
+  prevHash    String
+  chainHash   String
+  createdAt   DateTime     @default(now())
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, seq])
+  @@index([appId])
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  tier             Tier     @default(FREE)
+  appLimit         Int      @default(1)
+  status           String   @default("active")
+  currentPeriodEnd DateTime?
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ShareLink {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  scanId    String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  scan Scan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+}
+
+// Envelope-encrypted, short-lived credentials for deep audit (module 2).
+// Default policy: burn 24h after audit unless the user opts in to retention.
+model AuditCredential {
+  id        String   @id @default(cuid())
+  appId     String   @unique
+  kind      String // "pat" | "connection_string"
+  ciphertext String // base64 — data encrypted with a per-app DEK
+  encDek    String // base64 — DEK encrypted with the KMS master key
+  iv        String // base64
+  authTag   String // base64
+  persist   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+}

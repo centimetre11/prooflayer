@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0b1020;
+  --color-surface: #10182e;
+  --color-surface-2: #161f38;
+  --color-border: #24304f;
+  --color-foreground: #e8ecf6;
+  --color-muted: #9aa7c7;
+
+  --color-primary: #5b8cff;
+  --color-primary-fg: #08122b;
+  --color-accent: #35d0a5;
+
+  --color-critical: #ff5470;
+  --color-high: #ff8a4c;
+  --color-medium: #ffcf5c;
+  --color-low: #5b8cff;
+  --color-info: #9aa7c7;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius: 0.75rem;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html,
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(60rem 40rem at 80% -10%, rgba(91, 140, 255, 0.12), transparent 60%),
+    radial-gradient(50rem 40rem at -10% 10%, rgba(53, 208, 165, 0.08), transparent 60%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(91, 140, 255, 0.35);
+}
+
+/* thin scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}

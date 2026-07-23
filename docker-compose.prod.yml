@@ -1,0 +1,57 @@
+# Production stack for Prooflayer.
+# Nginx + Certbot live on the host (installed by scripts/deploy.sh --init);
+# this compose file only runs the app, its cron worker, and Postgres.
+# All secrets come from /opt/prooflayer/.env (never committed to Git).
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: prooflayer-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-prooflayer}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prooflayer}
+      POSTGRES_DB: ${POSTGRES_DB:-prooflayer}
+    volumes:
+      - prooflayer_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-prooflayer}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: prooflayer:latest
+    container_name: prooflayer-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    # Bind only to loopback; Nginx on the host terminates TLS and proxies here.
+    ports:
+      - "127.0.0.1:3000:3000"
+    # Create/refresh schema and seed rules (idempotent) before starting the server.
+    command: >
+      sh -c "npx prisma db push --skip-generate &&
+             npx tsx prisma/seed.ts &&
+             npm run start"
+
+  worker:
+    # Reuse the app image (built once by the `app` service).
+    image: prooflayer:latest
+    container_name: prooflayer-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      app:
+        condition: service_started
+    command: ["npx", "tsx", "worker/monitor.ts"]
+
+volumes:
+  prooflayer_pgdata:

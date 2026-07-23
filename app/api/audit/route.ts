@@ -1,0 +1,126 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { runDeepAudit } from "@/lib/auditor/rls";
+import { sealCredential } from "@/lib/auditor/crypto";
+import { auth } from "@/lib/auth";
+import type { Prisma } from "@prisma/client";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+const schema = z.object({
+  url: z.string().min(3).max(2048),
+  kind: z.enum(["connection_string", "pat"]),
+  secret: z.string().min(8),
+  projectRef: z.string().optional(),
+  persist: z.boolean().optional(),
+  appId: z.string().optional(),
+});
+
+export async function POST(req: Request) {
+  const json = await req.json().catch(() => null);
+  const parsed = schema.safeParse(json);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "invalid input" }, { status: 400 });
+  }
+  const { url, kind, secret, projectRef, persist } = parsed.data;
+
+  const session = await auth().catch(() => null);
+  let appId = parsed.data.appId ?? null;
+  if (session?.user?.id) {
+    const host = (() => {
+      try {
+        return new URL(url.startsWith("http") ? url : `https://${url}`).host;
+      } catch {
+        return url;
+      }
+    })();
+    const app =
+      (await prisma.app.findFirst({ where: { userId: session.user.id, url } })) ??
+      (await prisma.app.create({ data: { userId: session.user.id, name: host, url } }));
+    appId = app.id;
+  }
+
+  const scan = await prisma.scan.create({
+    data: { url, appId: appId ?? undefined, kind: "DEEP", status: "RUNNING", startedAt: new Date() },
+  });
+
+  try {
+    const result = await runDeepAudit({ kind, secret, projectRef });
+
+    await prisma.$transaction([
+      prisma.scan.update({
+        where: { id: scan.id },
+        data: {
+          status: "DONE",
+          finishedAt: new Date(),
+          rulesetVersion: "deep-audit-v1",
+          score: result.score,
+          riskCounts: result.riskCounts as unknown as Prisma.InputJsonValue,
+          meta: {
+            source: result.meta.source,
+            tableCount: result.tableCount,
+            errors: result.meta.errors,
+          } as unknown as Prisma.InputJsonValue,
+        },
+      }),
+      prisma.scanFinding.createMany({
+        data: result.findings.map((f) => ({
+          scanId: scan.id,
+          ruleId: f.ruleId,
+          category: f.category,
+          severity: f.severity,
+          title: f.title,
+          description: f.description,
+          confidence: f.confidence,
+          fingerprint: f.fingerprint,
+          evidence: f.evidence as unknown as Prisma.InputJsonValue,
+          remediation: f.remediation as unknown as Prisma.InputJsonValue,
+        })),
+      }),
+    ]);
+
+    // Credential retention is opt-in; default is burn (never stored).
+    if (persist && appId) {
+      const sealed = sealCredential(secret);
+      await prisma.auditCredential.upsert({
+        where: { appId },
+        update: {
+          kind,
+          ciphertext: sealed.ciphertext,
+          encDek: sealed.encDek,
+          iv: sealed.iv,
+          authTag: sealed.authTag,
+          persist: true,
+          expiresAt: new Date(Date.now() + 90 * 24 * 3600 * 1000),
+        },
+        create: {
+          appId,
+          kind,
+          ciphertext: sealed.ciphertext,
+          encDek: sealed.encDek,
+          iv: sealed.iv,
+          authTag: sealed.authTag,
+          persist: true,
+          expiresAt: new Date(Date.now() + 90 * 24 * 3600 * 1000),
+        },
+      });
+    }
+
+    return NextResponse.json({ scanId: scan.id });
+  } catch (err) {
+    await prisma.scan.update({
+      where: { id: scan.id },
+      data: {
+        status: "FAILED",
+        finishedAt: new Date(),
+        error: (err instanceof Error ? err.message : String(err)).slice(0, 500),
+      },
+    });
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "audit failed", scanId: scan.id },
+      { status: 502 }
+    );
+  }
+}
