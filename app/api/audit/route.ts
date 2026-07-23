@@ -12,12 +12,23 @@ export const maxDuration = 60;
 
 const schema = z.object({
   url: z.string().min(3).max(2048),
-  kind: z.enum(["connection_string", "pat", "firestore_rules"]),
+  // "auto" lets the server figure out what the user pasted (connection string
+  // vs Firestore rules) so the UI never has to expose backend types.
+  kind: z.enum(["auto", "connection_string", "pat", "firestore_rules"]).default("auto"),
   secret: z.string().min(8),
   projectRef: z.string().optional(),
   persist: z.boolean().optional(),
   appId: z.string().optional(),
 });
+
+// Sniff what the AI assistant handed back, so users don't pick a backend type.
+function detectKind(secret: string): "connection_string" | "firestore_rules" | null {
+  const s = secret.trim();
+  if (/^postgres(ql)?:\/\//i.test(s)) return "connection_string";
+  if (/rules_version|service\s+cloud\.firestore/i.test(s)) return "firestore_rules";
+  if (/\ballow\s+[a-z]/i.test(s) && /\bmatch\s+\//i.test(s)) return "firestore_rules";
+  return null;
+}
 
 export async function POST(req: Request) {
   const json = await req.json().catch(() => null);
@@ -25,7 +36,19 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
-  const { url, kind, secret, projectRef, persist } = parsed.data;
+  const { url, secret, projectRef, persist } = parsed.data;
+
+  let kind = parsed.data.kind;
+  if (kind === "auto") {
+    const detected = detectKind(secret);
+    if (!detected) {
+      return NextResponse.json(
+        { error: "没能识别粘贴的内容，请把 AI 助手返回的完整结果原样粘进来再试。" },
+        { status: 400 }
+      );
+    }
+    kind = detected;
+  }
 
   const session = await auth().catch(() => null);
   let appId = parsed.data.appId ?? null;
