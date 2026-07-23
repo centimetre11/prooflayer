@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import { BrandMark, BRAND_NAME } from "@/components/brand-mark";
 import { Providers } from "@/components/providers";
+import { SiteChrome } from "@/components/site-chrome";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { auth } from "@/lib/auth";
 import { isAdminRole } from "@/lib/admin/roles";
@@ -36,9 +37,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <SiteChrome header={<SiteHeader />} footer={<SiteFooter />}>
+            {children}
+          </SiteChrome>
         </Providers>
       </body>
     </html>
@@ -68,7 +69,14 @@ async function SiteHeader() {
           <Link href="/pricing" className="hover:text-[var(--color-foreground)]">
             定价
           </Link>
-          {loggedIn ? (
+          {showAdmin ? (
+            <Link
+              href="/admin"
+              className="rounded-lg border border-[var(--color-primary)] px-3 py-1.5 font-medium text-[var(--color-primary)] hover:brightness-110"
+            >
+              管理后台
+            </Link>
+          ) : loggedIn ? (
             <Link href="/dashboard" className="hover:text-[var(--color-foreground)]">
               控制台
             </Link>
@@ -77,11 +85,6 @@ async function SiteHeader() {
               注册
             </Link>
           )}
-          {showAdmin ? (
-            <Link href="/admin" className="hover:text-[var(--color-primary)]">
-              后台
-            </Link>
-          ) : null}
           {loggedIn ? (
             <>
               <span className="hidden max-w-[12rem] truncate text-xs sm:inline">

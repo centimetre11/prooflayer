@@ -35,7 +35,15 @@ export function LoginForm() {
         setError("邮箱或密码错误，或账号尚未开通");
         return;
       }
-      router.push("/dashboard");
+      // Route admins straight to the management console, users to the app console.
+      let dest = "/dashboard";
+      try {
+        const session = await fetch("/api/auth/session").then((r) => r.json());
+        if (session?.user?.role === "ADMIN") dest = "/admin";
+      } catch {
+        // fall back to /dashboard
+      }
+      router.push(dest);
       router.refresh();
     });
   }
