@@ -29,6 +29,7 @@ set -euo pipefail
 # ---- defaults -------------------------------------------------------------
 APP_NAME="prooflayer"
 APP_DIR=""                         # defaults to /opt/$APP_NAME
+APP_PORT="3000"                    # host loopback port Nginx proxies to
 STRATEGY="git"
 BRANCH="main"
 REPO_URL="https://github.com/centimetre11/prooflayer.git"
@@ -60,6 +61,7 @@ while [[ $# -gt 0 ]]; do
     --repo)     REPO_URL="$2"; shift 2 ;;
     --app-name) APP_NAME="$2"; shift 2 ;;
     --app-dir)  APP_DIR="$2"; shift 2 ;;
+    --port)     APP_PORT="$2"; shift 2 ;;
     --init)     INIT=1; shift ;;
     -h|--help)  usage 0 ;;
     *) echo "Unknown option: $1" >&2; usage 1 ;;
@@ -83,6 +85,7 @@ run_remote() { ssh "${SSH_OPTS[@]}" "$SSH_TARGET" "$@"; }
 log "target      : $SSH_TARGET"
 log "app dir     : $APP_DIR"
 log "strategy    : $STRATEGY"
+log "app port    : 127.0.0.1:$APP_PORT"
 log "branch/repo : $BRANCH  $REPO_URL"
 log "public url  : $APP_PUBLIC_URL"
 [[ -n "$DOMAIN" ]] && log "domain      : $DOMAIN (certbot email: $CERTBOT_EMAIL)"
@@ -186,7 +189,7 @@ log "building & starting containers (this pulls the Playwright image on first ru
 run_remote 'bash -s' <<EOF
 set -euo pipefail
 cd "$APP_DIR"
-sudo docker compose -f docker-compose.prod.yml up -d --build
+sudo env APP_PORT="$APP_PORT" docker compose -f docker-compose.prod.yml up -d --build
 sudo docker compose -f docker-compose.prod.yml ps
 EOF
 
@@ -201,7 +204,7 @@ server {
     client_max_body_size 10m;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:$APP_PORT;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -219,7 +222,6 @@ NGINX
 set -euo pipefail
 sudo mv "/tmp/$APP_NAME.nginx" "/etc/nginx/sites-available/$APP_NAME"
 sudo ln -sf "/etc/nginx/sites-available/$APP_NAME" "/etc/nginx/sites-enabled/$APP_NAME"
-sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx
 if sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$CERTBOT_EMAIL" --redirect; then

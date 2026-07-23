@@ -33,8 +33,9 @@ services:
       db:
         condition: service_healthy
     # Bind only to loopback; Nginx on the host terminates TLS and proxies here.
+    # Host port is configurable (this box already runs other apps on 3000/3100).
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
     # Create/refresh schema and seed rules (idempotent) before starting the server.
     command: >
       sh -c "npx prisma db push --skip-generate &&
