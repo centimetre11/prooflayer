@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScanForm } from "@/components/scan-form";
 import { NotificationSettings } from "@/components/notification-settings";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { formatDate } from "@/lib/utils";
 import { AppWindow, Bell, ShieldCheck, ArrowRight } from "lucide-react";
 
@@ -39,9 +40,12 @@ export default async function Dashboard() {
             {session.user.email} · {plan.name} 方案 · {apps.length}/{plan.appLimit} 应用
           </p>
         </div>
-        <Button asChild variant="secondary" size="sm">
-          <Link href="/pricing">升级方案</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/pricing">升级方案</Link>
+          </Button>
+          <SignOutButton className="inline-flex h-8 items-center rounded-lg border border-[var(--color-border)] px-3 text-sm text-[var(--color-foreground)] hover:border-[var(--color-primary)] disabled:opacity-50" />
+        </div>
       </div>
 
       <Card className="mt-6">

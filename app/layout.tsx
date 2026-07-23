@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import { BrandMark, BRAND_NAME } from "@/components/brand-mark";
 import { Providers } from "@/components/providers";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { auth } from "@/lib/auth";
 import { isAdminRole } from "@/lib/admin/roles";
 
@@ -81,12 +82,21 @@ async function SiteHeader() {
               后台
             </Link>
           ) : null}
-          <Link
-            href={loggedIn ? "/dashboard" : "/login"}
-            className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[var(--color-foreground)] hover:border-[var(--color-primary)]"
-          >
-            {loggedIn ? "进入控制台" : "登录"}
-          </Link>
+          {loggedIn ? (
+            <>
+              <span className="hidden max-w-[12rem] truncate text-xs sm:inline">
+                {session?.user?.email}
+              </span>
+              <SignOutButton />
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[var(--color-foreground)] hover:border-[var(--color-primary)]"
+            >
+              登录
+            </Link>
+          )}
         </nav>
       </div>
     </header>
