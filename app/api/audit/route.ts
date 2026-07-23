@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { runDeepAudit } from "@/lib/auditor/rls";
+import { runDeepAudit, runPgResultAudit } from "@/lib/auditor/rls";
 import { runFirestoreAudit } from "@/lib/auditor/firestore";
 import { sealCredential } from "@/lib/auditor/crypto";
 import { auth } from "@/lib/auth";
@@ -21,6 +21,24 @@ const schema = z.object({
   appId: z.string().optional(),
 });
 
+// If the assistant ran our read-only SQL, it pastes back a JSON envelope we can
+// analyze directly (no DB connection from our side).
+function tryParsePgEnvelope(
+  secret: string
+): { tables?: unknown; policies?: unknown; grants?: unknown; functions?: unknown } | null {
+  const t = secret.trim();
+  if (!t.startsWith("{")) return null;
+  try {
+    const o = JSON.parse(t);
+    if (o && typeof o === "object" && typeof o.prooflayer === "string" && o.prooflayer.startsWith("pg-audit")) {
+      return o;
+    }
+  } catch {
+    // not JSON
+  }
+  return null;
+}
+
 // Sniff what the AI assistant handed back, so users don't pick a backend type.
 function detectKind(secret: string): "connection_string" | "firestore_rules" | null {
   const s = secret.trim();
@@ -38,16 +56,25 @@ export async function POST(req: Request) {
   }
   const { url, secret, projectRef, persist } = parsed.data;
 
-  let kind = parsed.data.kind;
+  let kind: "auto" | "connection_string" | "pat" | "firestore_rules" | "pg_result" =
+    parsed.data.kind;
+  let pgPayload: { tables?: unknown; policies?: unknown; grants?: unknown; functions?: unknown } | null =
+    null;
   if (kind === "auto") {
-    const detected = detectKind(secret);
-    if (!detected) {
-      return NextResponse.json(
-        { error: "没能识别粘贴的内容，请把 AI 助手返回的完整结果原样粘进来再试。" },
-        { status: 400 }
-      );
+    const envelope = tryParsePgEnvelope(secret);
+    if (envelope) {
+      kind = "pg_result";
+      pgPayload = envelope;
+    } else {
+      const detected = detectKind(secret);
+      if (!detected) {
+        return NextResponse.json(
+          { error: "没能识别粘贴的内容，请把 AI 助手返回的完整结果原样粘进来再试。" },
+          { status: 400 }
+        );
+      }
+      kind = detected;
     }
-    kind = detected;
   }
 
   const session = await auth().catch(() => null);
@@ -72,9 +99,11 @@ export async function POST(req: Request) {
 
   try {
     const result =
-      kind === "firestore_rules"
-        ? runFirestoreAudit(secret)
-        : await runDeepAudit({ kind, secret, projectRef });
+      kind === "pg_result"
+        ? runPgResultAudit(pgPayload ?? {})
+        : kind === "firestore_rules"
+          ? runFirestoreAudit(secret)
+          : await runDeepAudit({ kind, secret, projectRef });
 
     await prisma.$transaction([
       prisma.scan.update({
@@ -109,8 +138,9 @@ export async function POST(req: Request) {
     ]);
 
     // Credential retention is opt-in; default is burn (never stored).
-    // Firestore rules are static text, not a reusable credential — never persist.
-    if (persist && appId && kind !== "firestore_rules") {
+    // Only a live connection string / PAT is a reusable credential; pasted
+    // result sets and Firestore rules are static data and are never persisted.
+    if (persist && appId && (kind === "connection_string" || kind === "pat")) {
       const sealed = sealCredential(secret);
       await prisma.auditCredential.upsert({
         where: { appId },

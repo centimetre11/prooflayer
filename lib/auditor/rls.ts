@@ -324,6 +324,30 @@ async function auditViaPat(ref: string, pat: string) {
   return { tables, policies, grants, funcs };
 }
 
+// Audit from a result set the user's AI assistant already collected (by running
+// our read-only SQL wherever it can reach the DB — local, tunnel, docker exec).
+// Nothing connects from our side, so internal/self-hosted DBs "just work" and no
+// credential ever leaves the user's environment.
+export function runPgResultAudit(payload: {
+  tables?: unknown;
+  policies?: unknown;
+  grants?: unknown;
+  functions?: unknown;
+}): AuditResult {
+  const tables = (Array.isArray(payload.tables) ? payload.tables : []) as TableRow[];
+  const policies = (Array.isArray(payload.policies) ? payload.policies : []) as PolicyRow[];
+  const grants = (Array.isArray(payload.grants) ? payload.grants : []) as GrantRow[];
+  const funcs = (Array.isArray(payload.functions) ? payload.functions : []) as FuncRow[];
+  const findings = analyze(tables, policies, grants, funcs);
+  return {
+    findings,
+    riskCounts: riskCounts(findings),
+    score: safetyScore(findings),
+    tableCount: tables.length,
+    meta: { errors: [], source: "pg_result" },
+  };
+}
+
 export async function runDeepAudit(input: AuditInput): Promise<AuditResult> {
   const errors: string[] = [];
   let data: {

@@ -11,21 +11,32 @@ import { Loader2, Sparkles, Copy, Check, ArrowDown } from "lucide-react";
 // both the local project and the cloud/deploy server, prepares a read-only
 // artifact, and outputs a single block. The human never has to understand any
 // of it — they just copy this and paste back whatever the assistant returns.
-const AGENT_PROMPT = `我在用 Prooflayer 给我的应用做一次更深入的安全体检，需要你帮我准备它要的东西。请你全自动完成，不要问我技术细节：
+const AGENT_PROMPT = `我在用 Prooflayer 给我的应用做一次更深入的安全体检，需要你帮我把体检数据取出来。请全自动完成，不要问我技术细节：
 
-1. 判断我的应用用的是什么后端/数据库，并且在两个地方都找：
-   - 本地项目（.env、配置文件、ORM/框架设置）
-   - 我的部署 / 云服务器（SSH 进服务器、docker compose、/opt 下各项目的 .env、正在运行的数据库容器）
+1. 判断我的应用用的是什么后端/数据库，并在两个地方都找：本地项目（.env、配置、ORM/框架设置）和我的部署/云服务器（SSH 进服务器、docker compose、/opt 下各项目的 .env、正在运行的数据库容器）。
 
-2. 按类型准备【只读】的体检材料，并且【只把最终这一段原样输出给我，不要任何解释】：
-   · 如果是 Postgres 系（Supabase / Neon / RDS / Railway / 自建都算）：先执行
-       CREATE ROLE prooflayer_ro LOGIN PASSWORD '<你生成的随机强密码>';
-       GRANT pg_read_all_data TO prooflayer_ro;
-     再输出这一行只读连接串（托管库结尾加 ?sslmode=require；自建没配 SSL 的加 ?sslmode=disable；只在内网的话给我一个外部能连上的形式，比如公网地址或 SSH 隧道后的 127.0.0.1）：
-       postgresql://prooflayer_ro:<密码>@<host>:<port>/<database>
-   · 如果是 Firebase：直接把我的 firestore.rules 文件的完整原文输出给我。
+2. 用【只读】方式取数据，并且【只把最终结果原样贴出来，不要任何解释】：
 
-约束：只给只读，绝不暴露写权限、service_role 或任何管理员密钥。体检完成后我会自己删掉这个只读账号。`;
+· 如果是 Postgres 系（Supabase / Neon / RDS / Railway / 自建都算）：用你够得着的任意只读方式连上它（本地、SSH 隧道、docker exec 都行，不需要对外暴露、也不用把地址密码给我），执行下面这一条 SQL，把它输出的那一段 JSON 原样贴给我：
+
+SELECT json_build_object(
+  'prooflayer','pg-audit-v1',
+  'tables',(SELECT coalesce(json_agg(row_to_json(x)),'[]'::json) FROM (
+    SELECT n.nspname AS schemaname, c.relname AS tablename, c.relrowsecurity AS rls_enabled, c.relforcerowsecurity AS rls_forced
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE c.relkind='r' AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast')) x),
+  'policies',(SELECT coalesce(json_agg(row_to_json(x)),'[]'::json) FROM (
+    SELECT schemaname,tablename,policyname,cmd,qual,with_check,roles FROM pg_policies) x),
+  'grants',(SELECT coalesce(json_agg(row_to_json(x)),'[]'::json) FROM (
+    SELECT table_schema,table_name,privilege_type,grantee FROM information_schema.role_table_grants
+    WHERE grantee IN ('anon','authenticated') AND table_schema NOT IN ('pg_catalog','information_schema')) x),
+  'functions',(SELECT coalesce(json_agg(row_to_json(x)),'[]'::json) FROM (
+    SELECT p.proname,p.prosecdef,p.proconfig FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public') x)
+);
+
+· 如果是 Firebase：直接把我的 firestore.rules 文件的完整原文贴给我。
+
+全程只读，不改动任何数据；不需要把数据库地址或密码给我。`;
 
 export function AuditForm() {
   const sp = useSearchParams();
