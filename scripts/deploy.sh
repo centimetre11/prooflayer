@@ -168,8 +168,15 @@ APP_URL=$APP_PUBLIC_URL
 AUTH_URL=$APP_PUBLIC_URL
 AUTH_SECRET=\$AUTH_SECRET
 
+EMAIL_PROVIDER=smtp
+EMAIL_FROM=麋鹿洞察 <admin@insightelk.com>
+SMTP_HOST=smtp.exmail.qq.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=admin@insightelk.com
+SMTP_PASS=
 RESEND_API_KEY=
-EMAIL_FROM=麋鹿洞察 <onboarding@resend.dev>
+ADMIN_EMAILS=admin@insightelk.com
 
 SCANNER_USER_AGENT=InsightElkBot/1.0 (+https://insightelk.com/bot)
 SCANNER_RENDER_TIMEOUT_MS=30000
@@ -178,7 +185,7 @@ CREDENTIAL_MASTER_KEY=\$CRED_KEY
 CRON_SECRET=\$CRON_SECRET
 ENV
   chmod 600 .env
-  echo "[deploy] .env created. Add RESEND_API_KEY later to enable real emails."
+  echo "[deploy] .env created. Fill SMTP_PASS (or RESEND_API_KEY) to enable real emails."
 else
   echo "[deploy] .env already exists — left untouched."
 fi

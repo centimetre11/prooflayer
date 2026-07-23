@@ -40,6 +40,17 @@ export default async function AdminUsersPage() {
                     {u.role}
                   </Badge>
                   <Badge>{u.subscription?.tier ?? "FREE"}</Badge>
+                  <Badge
+                    className={
+                      u.status === "ACTIVE"
+                        ? "text-[var(--color-accent)]"
+                        : u.status === "PENDING"
+                          ? "text-[var(--color-medium)]"
+                          : "text-[var(--color-critical)]"
+                    }
+                  >
+                    {u.status}
+                  </Badge>
                 </div>
                 <p className="text-xs text-[var(--color-muted)]">
                   {u.name ?? "未命名"} · {u._count.apps} 应用 ·{" "}

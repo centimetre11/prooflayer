@@ -1,15 +1,17 @@
 import type { DefaultSession } from "next-auth";
-import type { UserRole } from "@prisma/client";
+import type { AccountStatus, UserRole } from "@prisma/client";
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
       role: UserRole;
+      status: AccountStatus;
     } & DefaultSession["user"];
   }
 
   interface User {
     role?: UserRole;
+    status?: AccountStatus;
   }
 }

@@ -37,37 +37,39 @@ async function main() {
   }
   console.log(`Seeded ${ruleCount} rules.`);
 
-  // 2) Demo account (magic-link login by this email works in dev).
+  // 2) Demo account — already ACTIVE so you can log into the console immediately.
   const demo = await prisma.user.upsert({
     where: { email: "demo@insightelk.com" },
-    update: {},
+    update: { status: "ACTIVE", role: "USER" },
     create: {
       email: "demo@insightelk.com",
       name: "Demo Founder",
       role: "USER",
+      status: "ACTIVE",
       subscription: {
         create: { tier: "TEAM", appLimit: 15 },
       },
       notificationPreference: { create: {} },
     },
   });
-  console.log(`Demo user: ${demo.email}`);
+  console.log(`Demo user: ${demo.email} (status=${demo.status})`);
 
   // 3) Admin account for the ops console.
   const admin = await prisma.user.upsert({
     where: { email: "admin@insightelk.com" },
-    update: { role: "ADMIN" },
+    update: { role: "ADMIN", status: "ACTIVE" },
     create: {
       email: "admin@insightelk.com",
       name: "Ops Admin",
       role: "ADMIN",
+      status: "ACTIVE",
       subscription: {
         create: { tier: "ENTERPRISE", appLimit: 9999 },
       },
       notificationPreference: { create: {} },
     },
   });
-  console.log(`Admin user: ${admin.email} (role=${admin.role})`);
+  console.log(`Admin user: ${admin.email} (role=${admin.role}, status=${admin.status})`);
 }
 
 main()

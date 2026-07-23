@@ -22,7 +22,7 @@ export function isAdminRole(role: UserRole | undefined | null, email?: string | 
 export async function syncEnvAdminRole(userId: string, email: string | null | undefined) {
   if (!email || !envAdminEmails().has(email.toLowerCase())) return;
   await prisma.user.updateMany({
-    where: { id: userId, role: { not: "ADMIN" } },
-    data: { role: "ADMIN" },
+    where: { id: userId, OR: [{ role: { not: "ADMIN" } }, { status: { not: "ACTIVE" } }] },
+    data: { role: "ADMIN", status: "ACTIVE" },
   });
 }

@@ -67,11 +67,25 @@ enum UserRole {
   ADMIN
 }
 
+enum AccountStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum EmailKind {
   MAGIC_LINK
   ALERT
   WEEKLY_DIGEST
   SCAN_COMPLETE
+  APPLICATION
   SYSTEM
 }
 
@@ -87,13 +101,14 @@ enum EmailStatus {
 // ---------------------------------------------------------------------------
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?       @unique
   emailVerified DateTime?
   image         String?
-  role          UserRole  @default(USER)
-  createdAt     DateTime  @default(now())
+  role          UserRole      @default(USER)
+  status        AccountStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
 
   accounts               Account[]
   sessions               Session[]
@@ -101,6 +116,23 @@ model User {
   subscription           Subscription?
   notificationPreference NotificationPreference?
   emailDeliveries        EmailDelivery[]
+}
+
+// Access request before someone can log into the console.
+model AccessApplication {
+  id         String            @id @default(cuid())
+  email      String
+  name       String
+  company    String?
+  note       String?
+  status     ApplicationStatus @default(PENDING)
+  reviewedAt DateTime?
+  reviewedBy String?
+  createdAt  DateTime          @default(now())
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Account {

@@ -44,6 +44,9 @@ export default function RootLayout({
 async function SiteHeader() {
   const session = await auth();
   const showAdmin = isAdminRole(session?.user?.role, session?.user?.email);
+  const loggedIn =
+    !!session?.user &&
+    (showAdmin || session.user.status === "ACTIVE");
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-background)_82%,transparent)] backdrop-blur">
@@ -54,26 +57,32 @@ async function SiteHeader() {
           </span>
           <span className="text-lg tracking-tight">{BRAND_NAME}</span>
         </Link>
-        <nav className="flex items-center gap-5 text-sm text-[var(--color-muted)]">
+        <nav className="flex items-center gap-4 text-sm text-[var(--color-muted)] sm:gap-5">
           <Link href="/#how" className="hidden hover:text-[var(--color-foreground)] sm:block">
             工作原理
           </Link>
           <Link href="/pricing" className="hover:text-[var(--color-foreground)]">
             定价
           </Link>
-          <Link href="/dashboard" className="hover:text-[var(--color-foreground)]">
-            控制台
-          </Link>
+          {loggedIn ? (
+            <Link href="/dashboard" className="hover:text-[var(--color-foreground)]">
+              控制台
+            </Link>
+          ) : (
+            <Link href="/apply" className="hover:text-[var(--color-foreground)]">
+              申请使用
+            </Link>
+          )}
           {showAdmin ? (
             <Link href="/admin" className="hover:text-[var(--color-primary)]">
               后台
             </Link>
           ) : null}
           <Link
-            href="/login"
+            href={loggedIn ? "/dashboard" : "/login"}
             className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[var(--color-foreground)] hover:border-[var(--color-primary)]"
           >
-            登录
+            {loggedIn ? "进入控制台" : "登录"}
           </Link>
         </nav>
       </div>

@@ -3,6 +3,9 @@ export {
   alertEmail,
   weeklyDigestEmail,
   scanCompleteEmail,
+  applicationReceivedAdminEmail,
+  applicationApprovedEmail,
+  applicationRejectedEmail,
 } from "@/lib/email/templates";
 export {
   ensureNotificationPreference,

@@ -1,14 +1,7 @@
-import { Resend } from "resend";
 import type { EmailKind, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { canSendEmailKind } from "@/lib/email/preferences";
-
-let client: Resend | null = null;
-function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null;
-  if (!client) client = new Resend(process.env.RESEND_API_KEY);
-  return client;
-}
+import { deliverEmail, resolveEmailProvider } from "@/lib/email/transport";
 
 export interface EmailInput {
   to: string;
@@ -27,15 +20,20 @@ export interface SendEmailResult {
   id: string;
   deliveryId: string;
   status: "SENT" | "FAILED" | "SKIPPED";
+  provider?: string;
 }
 
 /**
- * Send an email via Resend, persist a delivery log, and honor user preferences.
- * Without RESEND_API_KEY (dev), logs to console and still records SENT.
+ * Send an email (SMTP / Resend / console), persist a delivery log,
+ * and honor user preferences.
  */
 export async function sendEmail(input: EmailInput): Promise<SendEmailResult> {
   const kind: EmailKind = input.kind ?? "SYSTEM";
-  const from = process.env.EMAIL_FROM ?? "麋鹿洞察 <onboarding@resend.dev>";
+  const from =
+    process.env.EMAIL_FROM ??
+    (process.env.SMTP_USER
+      ? `麋鹿洞察 <${process.env.SMTP_USER}>`
+      : "麋鹿洞察 <onboarding@resend.dev>");
 
   const delivery = await prisma.emailDelivery.create({
     data: {
@@ -61,23 +59,7 @@ export async function sendEmail(input: EmailInput): Promise<SendEmailResult> {
   }
 
   try {
-    const resend = getResend();
-    if (!resend) {
-      console.log(
-        `\n[email:dev-fallback] to=${input.to}\nsubject=${input.subject}\n${input.text ?? input.html}\n`
-      );
-      await prisma.emailDelivery.update({
-        where: { id: delivery.id },
-        data: {
-          status: "SENT",
-          providerId: "dev-fallback",
-          sentAt: new Date(),
-        },
-      });
-      return { id: "dev-fallback", deliveryId: delivery.id, status: "SENT" };
-    }
-
-    const res = await resend.emails.send({
+    const result = await deliverEmail({
       from,
       to: input.to,
       subject: input.subject,
@@ -85,25 +67,28 @@ export async function sendEmail(input: EmailInput): Promise<SendEmailResult> {
       text: input.text,
     });
 
-    if (res.error) {
-      throw new Error(res.error.message);
-    }
-
-    const providerId = res.data?.id ?? "sent";
     await prisma.emailDelivery.update({
       where: { id: delivery.id },
       data: {
         status: "SENT",
-        providerId,
+        providerId: `${result.provider}:${result.id}`,
         sentAt: new Date(),
       },
     });
-    return { id: providerId, deliveryId: delivery.id, status: "SENT" };
+    return {
+      id: result.id,
+      deliveryId: delivery.id,
+      status: "SENT",
+      provider: result.provider,
+    };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await prisma.emailDelivery.update({
       where: { id: delivery.id },
-      data: { status: "FAILED", error: message },
+      data: {
+        status: "FAILED",
+        error: `[${resolveEmailProvider()}] ${message}`,
+      },
     });
     throw err;
   }

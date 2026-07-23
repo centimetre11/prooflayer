@@ -1,8 +1,8 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { planFor } from "@/lib/plans";
+import { requireActiveUser } from "@/lib/access/session";
 import { buildDossier } from "@/lib/compliance/dossier";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,8 +23,7 @@ export default async function AppDetail({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  const session = await requireActiveUser();
   const { id } = await params;
 
   const app = await prisma.app.findFirst({

@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, AppWindow, Mail } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  AppWindow,
+  Mail,
+  ClipboardList,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV: {
@@ -12,6 +18,7 @@ const NAV: {
   exact?: boolean;
 }[] = [
   { href: "/admin", label: "概览", icon: LayoutDashboard, exact: true },
+  { href: "/admin/applications", label: "申请", icon: ClipboardList },
   { href: "/admin/users", label: "用户", icon: Users },
   { href: "/admin/apps", label: "应用", icon: AppWindow },
   { href: "/admin/emails", label: "邮件", icon: Mail },

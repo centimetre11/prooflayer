@@ -1,8 +1,7 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { planFor } from "@/lib/plans";
+import { requireActiveUser } from "@/lib/access/session";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScanForm } from "@/components/scan-form";
@@ -14,8 +13,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  const session = await requireActiveUser();
 
   const [apps, sub] = await Promise.all([
     prisma.app.findMany({

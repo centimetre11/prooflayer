@@ -129,3 +129,57 @@ export function scanCompleteEmail(input: {
       </div>`,
   };
 }
+
+export function applicationReceivedAdminEmail(input: {
+  name: string;
+  email: string;
+  company?: string;
+  note?: string;
+  reviewUrl: string;
+}) {
+  return {
+    subject: `[麋鹿洞察] 新用户申请：${input.name}`,
+    text: `新用户申请\n姓名：${input.name}\n邮箱：${input.email}\n公司：${input.company ?? "—"}\n说明：${input.note ?? "—"}\n审核：${input.reviewUrl}`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto">
+        <h2 style="color:#0b1210">新用户使用申请</h2>
+        <p style="color:#444"><b>${input.name}</b>（${input.email}）提交了控制台使用申请。</p>
+        <ul style="color:#222;padding-left:18px">
+          <li>公司 / 团队：${input.company ?? "未填写"}</li>
+          <li>说明：${input.note ?? "未填写"}</li>
+        </ul>
+        <p><a href="${input.reviewUrl}" style="display:inline-block;background:#d4a574;color:#1a140c;
+          padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">去后台审核</a></p>
+      </div>`,
+  };
+}
+
+export function applicationApprovedEmail(input: { name: string; loginUrl: string }) {
+  return {
+    subject: "[麋鹿洞察] 申请已通过，可以登录控制台了",
+    text: `${input.name}，你好。你的使用申请已通过。请前往登录：${input.loginUrl}`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
+        <h2 style="color:#0b1210">申请已通过</h2>
+        <p style="color:#444">${input.name}，你好。你的麋鹿洞察控制台使用申请已通过审核。</p>
+        <p style="color:#444">点击下方按钮，用申请邮箱收取登录链接即可进入控制台。</p>
+        <p><a href="${input.loginUrl}" style="display:inline-block;background:#d4a574;color:#1a140c;
+          padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">去登录</a></p>
+      </div>`,
+  };
+}
+
+export function applicationRejectedEmail(input: { name: string; reason?: string }) {
+  const reason = input.reason?.trim();
+  return {
+    subject: "[麋鹿洞察] 使用申请未通过",
+    text: `${input.name}，你好。很遗憾，你的使用申请未通过。${reason ? `原因：${reason}` : "如有疑问可回复本邮件。"}`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
+        <h2 style="color:#0b1210">申请未通过</h2>
+        <p style="color:#444">${input.name}，你好。很遗憾，你的使用申请本次未通过审核。</p>
+        ${reason ? `<p style="color:#444">原因：${reason}</p>` : ""}
+        <p style="color:#888;font-size:12px">如需重新申请，可再次填写申请表。</p>
+      </div>`,
+  };
+}

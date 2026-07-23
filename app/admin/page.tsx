@@ -8,6 +8,7 @@ export default async function AdminOverviewPage() {
 
   const [
     userCount,
+    pendingApps,
     appCount,
     openAlerts,
     scans7d,
@@ -16,7 +17,8 @@ export default async function AdminOverviewPage() {
     recentScans,
     recentEmails,
   ] = await Promise.all([
-    prisma.user.count(),
+    prisma.user.count({ where: { status: "ACTIVE" } }),
+    prisma.accessApplication.count({ where: { status: "PENDING" } }),
     prisma.app.count(),
     prisma.alert.count({ where: { state: { in: ["OPEN", "ACK"] } } }),
     prisma.scan.count({ where: { createdAt: { gte: since7d } } }),
@@ -36,7 +38,8 @@ export default async function AdminOverviewPage() {
   ]);
 
   const stats = [
-    { label: "用户", value: userCount, href: "/admin/users" },
+    { label: "活跃用户", value: userCount, href: "/admin/users" },
+    { label: "待审申请", value: pendingApps, href: "/admin/applications" },
     { label: "应用", value: appCount, href: "/admin/apps" },
     { label: "未关闭告警", value: openAlerts, href: "/admin/apps" },
     { label: "7 日扫描", value: scans7d, href: "/admin/apps" },
