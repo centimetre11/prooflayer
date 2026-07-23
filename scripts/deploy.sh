@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Prooflayer deploy script
+# 麋鹿洞察（InsightElk）deploy script
 #
 # Conventions:
 #   - Server directory:      /opt/<app-name>   (default: /opt/prooflayer)
@@ -169,9 +169,9 @@ AUTH_URL=$APP_PUBLIC_URL
 AUTH_SECRET=\$AUTH_SECRET
 
 RESEND_API_KEY=
-EMAIL_FROM=Prooflayer <onboarding@resend.dev>
+EMAIL_FROM=麋鹿洞察 <onboarding@resend.dev>
 
-SCANNER_USER_AGENT=ProoflayerBot/1.0 (+https://prooflayer.example/bot)
+SCANNER_USER_AGENT=InsightElkBot/1.0 (+https://insightelk.com/bot)
 SCANNER_RENDER_TIMEOUT_MS=30000
 
 CREDENTIAL_MASTER_KEY=\$CRED_KEY

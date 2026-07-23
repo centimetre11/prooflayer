@@ -16,7 +16,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Resend({
       apiKey: process.env.RESEND_API_KEY || "dev-fallback",
-      from: process.env.EMAIL_FROM || "Prooflayer <onboarding@resend.dev>",
+      from: process.env.EMAIL_FROM || "麋鹿洞察 <onboarding@resend.dev>",
       // Handle sending ourselves so dev works without a Resend key.
       async sendVerificationRequest({ identifier, url }) {
         const { subject, html, text } = magicLinkEmail(url);

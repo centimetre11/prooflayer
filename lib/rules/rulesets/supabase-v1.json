@@ -82,7 +82,7 @@
         "steps": [
           "Supabase 控制台 → Authentication → Policies 逐表确认 RLS 已启用",
           "对含用户数据的表编写最小权限策略，避免 USING (true)",
-          "在 Prooflayer 里连接只读凭证做一次深度 RLS 审计"
+          "在麋鹿洞察里连接只读凭证做一次深度 RLS 审计"
         ],
         "consolePath": "Authentication → Policies",
         "estMinutes": 20

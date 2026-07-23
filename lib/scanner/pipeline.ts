@@ -36,7 +36,7 @@ async function fetchRoot(url: string): Promise<string> {
     const res = await fetch(url, {
       headers: {
         "User-Agent":
-          process.env.SCANNER_USER_AGENT ?? "ProoflayerBot/1.0",
+          process.env.SCANNER_USER_AGENT ?? "InsightElkBot/1.0",
       },
       signal: controller.signal,
       redirect: "follow",

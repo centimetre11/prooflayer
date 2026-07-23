@@ -54,7 +54,7 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-8 text-center text-xs text-[var(--color-muted)]">
-        本页为方案展示，尚未接入支付网关。Prooflayer 仅提供检测工具，非安全担保方。
+        本页为方案展示，尚未接入支付网关。麋鹿洞察仅提供检测工具，非安全担保方。
       </p>
     </div>
   );

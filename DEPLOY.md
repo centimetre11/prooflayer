@@ -1,4 +1,4 @@
-# 部署指南（Prooflayer）
+# 部署指南（麋鹿洞察 / InsightElk）
 
 本项目按以下约定部署到自有服务器（Ubuntu），Web 应用跑在 Docker 里，
 Nginx + Certbot 装在宿主机上做反向代理与 TLS。

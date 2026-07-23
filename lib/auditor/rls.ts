@@ -238,18 +238,47 @@ function analyze(
   return findings;
 }
 
+// Works for ANY Postgres — Supabase, Neon, RDS, Railway, Render, self-hosted, etc.
+// Managed providers usually require SSL; self-hosted containers usually don't.
+function sslFor(conn: string): false | { rejectUnauthorized: boolean } {
+  const l = conn.toLowerCase();
+  if (l.includes("sslmode=disable")) return false;
+  if (/@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(l)) return false;
+  return { rejectUnauthorized: false };
+}
+
+// Connect with an SSL fallback: if the first attempt fails with an SSL-related
+// error, retry with the opposite SSL setting (covers both "SSL required" and
+// "server does not support SSL").
+async function connectPg(conn: string): Promise<Client> {
+  const primarySsl = sslFor(conn);
+  const first = new Client({ connectionString: conn, ssl: primarySsl, statement_timeout: 15000 });
+  try {
+    await first.connect();
+    return first;
+  } catch (err) {
+    await first.end().catch(() => {});
+    const msg = String((err as Error)?.message ?? err).toLowerCase();
+    if (msg.includes("ssl") || msg.includes("secure") || msg.includes("certificate") || msg.includes("encryption")) {
+      const alt = new Client({
+        connectionString: conn,
+        ssl: primarySsl ? false : { rejectUnauthorized: false },
+        statement_timeout: 15000,
+      });
+      await alt.connect();
+      return alt;
+    }
+    throw err;
+  }
+}
+
 async function auditViaConnection(conn: string): Promise<{
   tables: TableRow[];
   policies: PolicyRow[];
   grants: GrantRow[];
   funcs: FuncRow[];
 }> {
-  const client = new Client({
-    connectionString: conn,
-    ssl: conn.includes("localhost") ? undefined : { rejectUnauthorized: false },
-    statement_timeout: 15000,
-  });
-  await client.connect();
+  const client = await connectPg(conn);
   try {
     // enforce read-only session
     await client.query("SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY;");

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ScanForm } from "@/components/scan-form";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  ShieldCheck,
   FileClock,
   Bell,
   KeyRound,
@@ -10,6 +9,7 @@ import {
   ScanLine,
   ArrowRight,
 } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function Home() {
   return (
@@ -18,8 +18,8 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-5 pt-16 pb-12 sm:pt-24">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs text-[var(--color-muted)]">
-            <ShieldCheck size={14} className="text-[var(--color-accent)]" />
-            为 vibe coding 长成业务的应用而生
+            <BrandMark size={14} className="text-[var(--color-accent)]" />
+            麋鹿洞察 · 为 vibe coding 长成业务的应用而生
           </span>
           <h1 className="mt-6 text-balance text-4xl font-bold tracking-tight sm:text-6xl">
             60 秒检查你的应用
@@ -27,7 +27,7 @@ export default function Home() {
             <span className="text-[var(--color-primary)]">是否泄露了数据库钥匙</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-lg text-[var(--color-muted)]">
-            Prooflayer 是 AI 生成应用的「合规档案 + 保险」。从免费安全体检切入，为你留存持续尽责的证据链——出事故或客户尽调时，一键自证清白。
+            麋鹿洞察是 AI 生成应用的「合规档案 + 保险」。从免费安全体检切入，为你留存持续尽责的证据链——出事故或客户尽调时，一键自证清白。
           </p>
           <div className="mx-auto mt-8 max-w-xl">
             <ScanForm />

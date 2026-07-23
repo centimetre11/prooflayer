@@ -150,7 +150,7 @@ export function renderDossierHtml(d: Dossier): string {
     .map((t) => `<li><code>${t.at}</code> · ${t.type} · ${t.summary}</li>`)
     .join("");
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
-  <title>尽调应答包 · ${d.app.name}</title>
+  <title>麋鹿洞察 · 尽调应答包 · ${d.app.name}</title>
   <style>
     body{font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:820px;margin:40px auto;padding:0 20px;color:#111;line-height:1.6}
     h1{margin-bottom:4px} .sub{color:#666;font-size:13px;margin-bottom:24px}
@@ -178,6 +178,6 @@ export function renderDossierHtml(d: Dossier): string {
   ${rows}
   <h2>证据时间轴（近 40 条）</h2>
   <ul>${tl}</ul>
-  <div class="foot">本应答包由 Prooflayer 依据不可篡改证据链自动生成。Prooflayer 仅提供检测与存证工具，非安全担保方；本材料用于尽职调查参考，不构成安全保证。</div>
+  <div class="foot">本应答包由麋鹿洞察依据不可篡改证据链自动生成。麋鹿洞察仅提供检测与存证工具，非安全担保方；本材料用于尽职调查参考，不构成安全保证。</div>
   </body></html>`;
 }

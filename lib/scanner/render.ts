@@ -35,7 +35,7 @@ export async function renderAndCollect(url: string): Promise<RenderResult> {
   const timeout = Number(process.env.SCANNER_RENDER_TIMEOUT_MS ?? 30000);
   const ua =
     process.env.SCANNER_USER_AGENT ??
-    "ProoflayerBot/1.0 (+https://prooflayer.example/bot)";
+    "InsightElkBot/1.0 (+https://insightelk.com/bot)";
 
   const browser = await getBrowser();
   const context = await browser.newContext({

@@ -39,10 +39,10 @@ async function main() {
 
   // 2) A demo account (magic-link login by this email works in dev).
   const demo = await prisma.user.upsert({
-    where: { email: "demo@prooflayer.dev" },
+    where: { email: "demo@insightelk.com" },
     update: {},
     create: {
-      email: "demo@prooflayer.dev",
+      email: "demo@insightelk.com",
       name: "Demo Founder",
       subscription: {
         create: { tier: "TEAM", appLimit: 15 },

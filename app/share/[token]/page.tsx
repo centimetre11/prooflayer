@@ -5,7 +5,7 @@ import { ReportView } from "@/components/report-view";
 import { Card, CardContent } from "@/components/ui/card";
 import type { FindingView } from "@/components/finding-card";
 import type { Severity } from "@/lib/types";
-import { ShieldCheck } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 
 export const runtime = "nodejs";
 
@@ -37,10 +37,10 @@ export default async function SharedReport({
     <div className="mx-auto max-w-4xl px-5 py-10">
       <Card className="mb-6">
         <CardContent className="flex items-center gap-3 p-4 text-sm text-[var(--color-muted)]">
-          <ShieldCheck size={18} className="text-[var(--color-accent)]" />
+          <BrandMark size={18} className="text-[var(--color-accent)]" />
           这是一份只读的安全体检报告，由
           <Link href="/" className="text-[var(--color-primary)] hover:underline">
-            Prooflayer
+            麋鹿洞察
           </Link>
           生成。
         </CardContent>

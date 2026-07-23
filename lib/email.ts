@@ -19,7 +19,7 @@ export interface EmailInput {
  * instead so flows (magic-link login, alerts) remain fully testable offline.
  */
 export async function sendEmail({ to, subject, html, text }: EmailInput) {
-  const from = process.env.EMAIL_FROM ?? "Prooflayer <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM ?? "麋鹿洞察 <onboarding@resend.dev>";
   const resend = getResend();
   if (!resend) {
     console.log(
@@ -33,13 +33,13 @@ export async function sendEmail({ to, subject, html, text }: EmailInput) {
 
 export function magicLinkEmail(url: string): { subject: string; html: string; text: string } {
   return {
-    subject: "登录 Prooflayer",
-    text: `点击链接登录 Prooflayer：${url}`,
+    subject: "登录麋鹿洞察",
+    text: `点击链接登录麋鹿洞察：${url}`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
-        <h2 style="color:#0b1020">登录 Prooflayer</h2>
+        <h2 style="color:#0b1210">登录麋鹿洞察</h2>
         <p style="color:#444">点击下面的按钮完成登录，链接短时间内有效。</p>
-        <p><a href="${url}" style="display:inline-block;background:#5b8cff;color:#08122b;
+        <p><a href="${url}" style="display:inline-block;background:#d4a574;color:#1a140c;
           padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">登录</a></p>
         <p style="color:#888;font-size:12px">如果不是你本人操作，忽略此邮件即可。</p>
       </div>`,
@@ -54,13 +54,13 @@ export function alertEmail(appName: string, items: { title: string; severity: st
     )
     .join("");
   return {
-    subject: `[Prooflayer] ${appName} 检测到安全回退`,
+    subject: `[麋鹿洞察] ${appName} 检测到安全回退`,
     text: `${appName} 检测到安全回退：\n${items
       .map((i) => `- [${i.severity}] ${i.title}`)
       .join("\n")}`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto">
-        <h2 style="color:#0b1020">${appName} 检测到安全回退</h2>
+        <h2 style="color:#0b1210">${appName} 检测到安全回退</h2>
         <p style="color:#444">监测发现你的应用出现新的高优风险（配置回退或密钥泄露）：</p>
         <ul style="color:#222">${rows}</ul>
         <p style="color:#888;font-size:12px">我们只告警不阻断。登录控制台查看详情与修复指引。</p>

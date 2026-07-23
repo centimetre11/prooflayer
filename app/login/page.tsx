@@ -24,7 +24,7 @@ export default async function LoginPage({
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <LogIn size={18} /> 登录 Prooflayer
+            <LogIn size={18} /> 登录麋鹿洞察
           </CardTitle>
           <CardDescription>输入邮箱，我们会发送一条登录链接（无需密码）。</CardDescription>
         </CardHeader>
@@ -50,7 +50,7 @@ export default async function LoginPage({
                 发送登录链接
               </Button>
               <p className="text-center text-xs text-[var(--color-muted)]">
-                种子数据里已有 demo@prooflayer.dev（Team 方案）可直接登录体验。
+                种子数据里已有 demo@insightelk.com（Team 方案）可直接登录体验。
               </p>
             </form>
           )}

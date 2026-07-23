@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { runDeepAudit } from "@/lib/auditor/rls";
+import { runFirestoreAudit } from "@/lib/auditor/firestore";
 import { sealCredential } from "@/lib/auditor/crypto";
 import { auth } from "@/lib/auth";
 import type { Prisma } from "@prisma/client";
@@ -11,7 +12,7 @@ export const maxDuration = 60;
 
 const schema = z.object({
   url: z.string().min(3).max(2048),
-  kind: z.enum(["connection_string", "pat"]),
+  kind: z.enum(["connection_string", "pat", "firestore_rules"]),
   secret: z.string().min(8),
   projectRef: z.string().optional(),
   persist: z.boolean().optional(),
@@ -47,7 +48,10 @@ export async function POST(req: Request) {
   });
 
   try {
-    const result = await runDeepAudit({ kind, secret, projectRef });
+    const result =
+      kind === "firestore_rules"
+        ? runFirestoreAudit(secret)
+        : await runDeepAudit({ kind, secret, projectRef });
 
     await prisma.$transaction([
       prisma.scan.update({
@@ -55,7 +59,7 @@ export async function POST(req: Request) {
         data: {
           status: "DONE",
           finishedAt: new Date(),
-          rulesetVersion: "deep-audit-v1",
+          rulesetVersion: kind === "firestore_rules" ? "firestore-rules-v1" : "deep-audit-v1",
           score: result.score,
           riskCounts: result.riskCounts as unknown as Prisma.InputJsonValue,
           meta: {
@@ -82,7 +86,8 @@ export async function POST(req: Request) {
     ]);
 
     // Credential retention is opt-in; default is burn (never stored).
-    if (persist && appId) {
+    // Firestore rules are static text, not a reusable credential — never persist.
+    if (persist && appId && kind !== "firestore_rules") {
       const sealed = sealCredential(secret);
       await prisma.auditCredential.upsert({
         where: { appId },

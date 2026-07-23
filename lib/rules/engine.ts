@@ -195,7 +195,7 @@ async function matchHttpProbe(
     const res = await fetch(url, {
       method: p.method ?? "GET",
       headers: {
-        "User-Agent": process.env.SCANNER_USER_AGENT ?? "ProoflayerBot/1.0",
+        "User-Agent": process.env.SCANNER_USER_AGENT ?? "InsightElkBot/1.0",
         ...(p.headers ?? {}),
       },
       signal: controller.signal,

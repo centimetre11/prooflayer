@@ -39,7 +39,7 @@ export async function GET(
   return new NextResponse(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Content-Disposition": `attachment; filename="prooflayer-dossier-${appId}.html"`,
+      "Content-Disposition": `attachment; filename="milu-dossier-${appId}.html"`,
     },
   });
 }

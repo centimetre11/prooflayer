@@ -1,8 +1,8 @@
-# Prooflayer — Vibe 应用治理套件
+# 麋鹿洞察（InsightElk）— Vibe 应用治理套件
 
 > 为 vibe coding 长成业务的应用，提供"持续尽责的证明"——从免费安全体检切入，以治理订阅和合规档案为收入主体。
 
-Prooflayer 是 AI 生成应用（Lovable / Bolt / v0 / Cursor 等）的「合规档案 + 保险」。它对 Supabase 生态应用做真实的外部安全体检、深度 RLS 审计、每日漂移监测，并把每一次结果沉淀为不可篡改的证据链——出事故或客户尽调时，一键自证清白。
+麋鹿洞察是 AI 生成应用（Lovable / Bolt / v0 / Cursor 等）的「合规档案 + 保险」。它对 Supabase 生态应用做真实的外部安全体检、深度 RLS 审计、每日漂移监测，并把每一次结果沉淀为不可篡改的证据链——出事故或客户尽调时，一键自证清白。
 
 本仓库是完整 MVP：**真实可运行的扫描引擎 + 深度审计 + 持续监测告警 + 合规档案 + 恐慌时刻付费墙**，Next.js 全栈实现。
 
@@ -73,7 +73,7 @@ docker compose up -d
 
 ```bash
 npm run db:push     # 或 npm run db:migrate
-npm run db:seed     # 落库规则集（保证历史报告可复现）+ demo@prooflayer.dev
+npm run db:seed     # 落库规则集（保证历史报告可复现）+ demo@insightelk.com
 ```
 
 ### 5. 运行
@@ -86,7 +86,7 @@ npm run dev
 
 ## 真实扫描示例
 
-入口页粘贴一个用 Supabase 的公开应用地址，Prooflayer 会：
+入口页粘贴一个用 Supabase 的公开应用地址，麋鹿洞察会：
 
 1. 用真实浏览器渲染页面，抓取前端 bundle 与运行时 XHR/fetch；
 2. 提取 Supabase 项目地址、解码 JWT 判断 anon / **service_role**（后者出现在前端即为严重事故）；
