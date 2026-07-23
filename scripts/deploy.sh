@@ -91,17 +91,17 @@ log "public url  : $APP_PUBLIC_URL"
 [[ -n "$DOMAIN" ]] && log "domain      : $DOMAIN (certbot email: $CERTBOT_EMAIL)"
 
 # ---- 0. connectivity check ------------------------------------------------
-log "checking SSH connectivity…"
+log "checking SSH connectivity..."
 run_remote "echo ok >/dev/null" || { echo "Cannot SSH to $SSH_TARGET" >&2; exit 1; }
 
 # ---- 1. provisioning (--init) --------------------------------------------
 if [[ "$INIT" -eq 1 ]]; then
-  log "provisioning host (Docker + Nginx + Certbot)…"
+  log "provisioning host (Docker + Nginx + Certbot)..."
   run_remote 'bash -s' <<'INIT'
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 if ! command -v docker >/dev/null 2>&1; then
-  echo "[init] installing Docker…"
+  echo "[init] installing Docker..."
   curl -fsSL https://get.docker.com | sudo sh
   sudo usermod -aG docker "$USER" || true
 fi
@@ -109,7 +109,7 @@ if ! sudo docker compose version >/dev/null 2>&1; then
   sudo apt-get update -y
   sudo apt-get install -y docker-compose-plugin
 fi
-echo "[init] installing Nginx / Certbot / git / rsync…"
+echo "[init] installing Nginx / Certbot / git / rsync..."
 sudo apt-get update -y
 sudo apt-get install -y nginx certbot python3-certbot-nginx git rsync openssl
 sudo systemctl enable --now nginx
@@ -118,12 +118,12 @@ INIT
 fi
 
 # ---- 2. ensure app dir ----------------------------------------------------
-log "ensuring $APP_DIR exists…"
+log "ensuring $APP_DIR exists..."
 run_remote "sudo mkdir -p '$APP_DIR' && sudo chown -R \$(whoami):\$(whoami) '$APP_DIR'"
 
 # ---- 3. sync code ---------------------------------------------------------
 if [[ "$STRATEGY" == "git" ]]; then
-  log "syncing code via git ($BRANCH)…"
+  log "syncing code via git ($BRANCH)..."
   run_remote 'bash -s' <<EOF
 set -euo pipefail
 if [ -d "$APP_DIR/.git" ]; then
@@ -136,7 +136,7 @@ else
 fi
 EOF
 elif [[ "$STRATEGY" == "rsync" ]]; then
-  log "syncing code via rsync…"
+  log "syncing code via rsync..."
   rsync -az --delete \
     --exclude '.git' --exclude 'node_modules' --exclude '.next' \
     --exclude '.env' --exclude '.env.*' --exclude '.DS_Store' \
@@ -147,12 +147,12 @@ else
 fi
 
 # ---- 4. ensure .env on the server ----------------------------------------
-log "ensuring .env on server (generated once, never overwritten)…"
+log "ensuring .env on server (generated once, never overwritten)..."
 run_remote 'bash -s' <<EOF
 set -euo pipefail
 cd "$APP_DIR"
 if [ ! -f .env ]; then
-  echo "[deploy] .env not found — generating with random secrets…"
+  echo "[deploy] .env not found — generating with random secrets..."
   DB_PW=\$(openssl rand -hex 24)
   AUTH_SECRET=\$(openssl rand -base64 32)
   CRED_KEY=\$(openssl rand -base64 32)
@@ -185,7 +185,7 @@ fi
 EOF
 
 # ---- 5. build & start containers -----------------------------------------
-log "building & starting containers (this pulls the Playwright image on first run)…"
+log "building & starting containers (this pulls the Playwright image on first run)..."
 run_remote 'bash -s' <<EOF
 set -euo pipefail
 cd "$APP_DIR"
@@ -195,7 +195,7 @@ EOF
 
 # ---- 6. nginx + TLS (only when a domain is provided) ----------------------
 if [[ -n "$DOMAIN" ]]; then
-  log "configuring Nginx for $DOMAIN…"
+  log "configuring Nginx for $DOMAIN..."
   TMP_NGINX="$(mktemp)"
   cat > "$TMP_NGINX" <<NGINX
 server {
