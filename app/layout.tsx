@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { BrandMark, BRAND_NAME } from "@/components/brand-mark";
+import { Providers } from "@/components/providers";
 import { auth } from "@/lib/auth";
 import { isAdminRole } from "@/lib/admin/roles";
 
@@ -33,9 +34,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <Providers>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+        </Providers>
       </body>
     </html>
   );
@@ -57,7 +60,7 @@ async function SiteHeader() {
           </span>
           <span className="text-lg tracking-tight">{BRAND_NAME}</span>
         </Link>
-        <nav className="flex items-center gap-4 text-sm text-[var(--color-muted)] sm:gap-5">
+        <nav className="flex items-center gap-3 text-sm text-[var(--color-muted)] sm:gap-5">
           <Link href="/#how" className="hidden hover:text-[var(--color-foreground)] sm:block">
             工作原理
           </Link>
@@ -69,8 +72,8 @@ async function SiteHeader() {
               控制台
             </Link>
           ) : (
-            <Link href="/apply" className="hover:text-[var(--color-foreground)]">
-              申请使用
+            <Link href="/register" className="hidden hover:text-[var(--color-foreground)] sm:block">
+              注册
             </Link>
           )}
           {showAdmin ? (

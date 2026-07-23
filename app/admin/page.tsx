@@ -1,14 +1,16 @@
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
+import { summarizeCapabilities } from "@/lib/capabilities/catalog";
 import Link from "next/link";
 
 export default async function AdminOverviewPage() {
   const since7d = new Date(Date.now() - 7 * 24 * 3600 * 1000);
+  const { totals: capabilityTotals } = summarizeCapabilities();
 
   const [
     userCount,
-    pendingApps,
+    subscriberCount,
     appCount,
     openAlerts,
     scans7d,
@@ -18,7 +20,7 @@ export default async function AdminOverviewPage() {
     recentEmails,
   ] = await Promise.all([
     prisma.user.count({ where: { status: "ACTIVE" } }),
-    prisma.accessApplication.count({ where: { status: "PENDING" } }),
+    prisma.emailSubscriber.count({ where: { unsubscribed: false } }),
     prisma.app.count(),
     prisma.alert.count({ where: { state: { in: ["OPEN", "ACK"] } } }),
     prisma.scan.count({ where: { createdAt: { gte: since7d } } }),
@@ -39,12 +41,17 @@ export default async function AdminOverviewPage() {
 
   const stats = [
     { label: "活跃用户", value: userCount, href: "/admin/users" },
-    { label: "待审申请", value: pendingApps, href: "/admin/applications" },
+    { label: "资讯订阅", value: subscriberCount, href: "/admin/subscribers" },
     { label: "应用", value: appCount, href: "/admin/apps" },
     { label: "未关闭告警", value: openAlerts, href: "/admin/apps" },
     { label: "7 日扫描", value: scans7d, href: "/admin/apps" },
     { label: "7 日邮件", value: emails7d, href: "/admin/emails" },
     { label: "7 日失败邮件", value: failedEmails, href: "/admin/emails" },
+    {
+      label: "检测已落地",
+      value: capabilityTotals.done,
+      href: "/admin/capabilities",
+    },
   ];
 
   return (

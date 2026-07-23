@@ -66,14 +66,14 @@ export default function PricingPage() {
                   variant={p.highlight ? "primary" : "secondary"}
                   className="mt-6 w-full"
                 >
-                  <Link href="/login">
+                  <Link href={p.tier === "ENTERPRISE" ? "/#subscribe" : "/register"}>
                     {p.tier === "FREE"
-                      ? "免费开始"
+                      ? "免费注册"
                       : p.tier === "ENTERPRISE"
-                        ? "联系我们"
+                        ? "登记邮箱咨询"
                         : onPromo
-                          ? "限时免费领取"
-                          : "选择方案"}
+                          ? "限时免费注册"
+                          : "注册开通"}
                   </Link>
                 </Button>
               </CardContent>

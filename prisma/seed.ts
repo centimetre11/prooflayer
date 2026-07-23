@@ -1,11 +1,13 @@
 import { PrismaClient, Prisma, type Severity } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import { allRuleSets } from "../lib/rules/loader";
 
 const prisma = new PrismaClient();
 
+/** Default password for seeded accounts — change after first login in production. */
+const SEED_PASSWORD = process.env.SEED_PASSWORD || "InsightElk2026!";
+
 async function main() {
-  // 1) Snapshot every ruleset into the Rule catalog so historical reports
-  //    remain reproducible even as rules evolve.
   let ruleCount = 0;
   for (const rs of allRuleSets()) {
     for (const r of rs.rules) {
@@ -37,39 +39,49 @@ async function main() {
   }
   console.log(`Seeded ${ruleCount} rules.`);
 
-  // 2) Demo account — already ACTIVE so you can log into the console immediately.
+  const passwordHash = await bcrypt.hash(SEED_PASSWORD, 12);
+
   const demo = await prisma.user.upsert({
     where: { email: "demo@insightelk.com" },
-    update: { status: "ACTIVE", role: "USER" },
+    update: {
+      status: "ACTIVE",
+      role: "USER",
+      passwordHash,
+    },
     create: {
       email: "demo@insightelk.com",
       name: "Demo Founder",
       role: "USER",
       status: "ACTIVE",
+      passwordHash,
       subscription: {
         create: { tier: "TEAM", appLimit: 15 },
       },
       notificationPreference: { create: {} },
     },
   });
-  console.log(`Demo user: ${demo.email} (status=${demo.status})`);
+  console.log(`Demo user: ${demo.email} / ${SEED_PASSWORD}`);
 
-  // 3) Admin account for the ops console.
   const admin = await prisma.user.upsert({
     where: { email: "admin@insightelk.com" },
-    update: { role: "ADMIN", status: "ACTIVE" },
+    update: {
+      role: "ADMIN",
+      status: "ACTIVE",
+      passwordHash,
+    },
     create: {
       email: "admin@insightelk.com",
       name: "Ops Admin",
       role: "ADMIN",
       status: "ACTIVE",
+      passwordHash,
       subscription: {
         create: { tier: "ENTERPRISE", appLimit: 9999 },
       },
       notificationPreference: { create: {} },
     },
   });
-  console.log(`Admin user: ${admin.email} (role=${admin.role}, status=${admin.status})`);
+  console.log(`Admin user: ${admin.email} / ${SEED_PASSWORD}`);
 }
 
 main()

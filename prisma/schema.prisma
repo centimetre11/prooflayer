@@ -106,6 +106,7 @@ model User {
   email         String?       @unique
   emailVerified DateTime?
   image         String?
+  passwordHash  String? // bcrypt hash for email/password login
   role          UserRole      @default(USER)
   status        AccountStatus @default(PENDING)
   createdAt     DateTime      @default(now())
@@ -116,6 +117,17 @@ model User {
   subscription           Subscription?
   notificationPreference NotificationPreference?
   emailDeliveries        EmailDelivery[]
+}
+
+// Marketing / product-update leads — NOT console accounts.
+model EmailSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  source       String? // homepage | pricing | footer
+  unsubscribed Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 // Access request before someone can log into the console.

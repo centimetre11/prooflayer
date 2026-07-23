@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ScanForm } from "@/components/scan-form";
+import { SubscribeForm } from "@/components/subscribe-form";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   FileClock,
@@ -8,6 +9,7 @@ import {
   DatabaseZap,
   ScanLine,
   ArrowRight,
+  Mail,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 
@@ -101,6 +103,31 @@ export default function Home() {
           >
             查看定价 <ArrowRight size={16} />
           </Link>
+        </div>
+      </section>
+
+      {/* Newsletter — separate from console accounts */}
+      <section
+        id="subscribe"
+        className="border-t border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface)_40%,transparent)] py-16"
+      >
+        <div className="mx-auto max-w-xl px-5 text-center">
+          <span className="inline-flex items-center gap-2 text-[var(--color-primary)]">
+            <Mail size={18} />
+          </span>
+          <h2 className="mt-3 text-2xl font-semibold">登记邮箱，收产品资讯</h2>
+          <p className="mt-2 text-sm text-[var(--color-muted)]">
+            不用注册账号。我们只发送产品更新与安全资讯，不会用此邮箱开通控制台。
+          </p>
+          <div className="mt-6">
+            <SubscribeForm source="homepage" />
+          </div>
+          <p className="mt-4 text-xs text-[var(--color-muted)]">
+            需要监测告警与合规档案？{" "}
+            <Link href="/register" className="text-[var(--color-primary)] hover:underline">
+              注册控制台账号
+            </Link>
+          </p>
         </div>
       </section>
     </div>

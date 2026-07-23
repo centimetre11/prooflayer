@@ -1,61 +1,71 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import Resend from "next-auth/providers/resend";
+import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db";
-import { sendEmail, magicLinkEmail } from "@/lib/email";
+import { verifyPassword } from "@/lib/password";
 import { isAdminRole, syncEnvAdminRole } from "@/lib/admin/roles";
-import { canLoginWithEmail } from "@/lib/access/applications";
+import type { AccountStatus, UserRole } from "@prisma/client";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  // Running behind Nginx reverse proxy in production.
+  // Credentials + JWT (database sessions are not supported with credentials).
   trustHost: true,
-  session: { strategy: "database" },
+  session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
-    verifyRequest: "/login?check=1",
     error: "/login",
   },
   providers: [
-    Resend({
-      apiKey: process.env.RESEND_API_KEY || "dev-fallback",
-      from: process.env.EMAIL_FROM || "麋鹿洞察 <onboarding@resend.dev>",
-      async sendVerificationRequest({ identifier, url }) {
-        const gate = await canLoginWithEmail(identifier);
-        if (!gate.ok) {
-          console.warn(`[auth] blocked magic link for ${identifier}: ${gate.code}`);
-          return;
-        }
-        const { subject, html, text } = magicLinkEmail(url);
-        await sendEmail({
-          to: identifier,
-          subject,
-          html,
-          text,
-          kind: "MAGIC_LINK",
-          userId: gate.user.id,
-        });
+    Credentials({
+      name: "credentials",
+      credentials: {
+        email: { label: "邮箱", type: "email" },
+        password: { label: "密码", type: "password" },
+      },
+      async authorize(credentials) {
+        const email = String(credentials?.email ?? "")
+          .trim()
+          .toLowerCase();
+        const password = String(credentials?.password ?? "");
+        if (!email || !password) return null;
+
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user?.passwordHash) return null;
+
+        const valid = await verifyPassword(password, user.passwordHash);
+        if (!valid) return null;
+
+        if (user.role !== "ADMIN" && user.status !== "ACTIVE") return null;
+
+        await syncEnvAdminRole(user.id, user.email);
+        const role: UserRole = isAdminRole(user.role, user.email)
+          ? "ADMIN"
+          : user.role;
+        const status: AccountStatus =
+          role === "ADMIN" ? "ACTIVE" : user.status;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role,
+          status,
+        };
       },
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
-      if (!user.email) return false;
-      const gate = await canLoginWithEmail(user.email);
-      return gate.ok;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id!;
+        token.role = (user as { role?: UserRole }).role ?? "USER";
+        token.status = (user as { status?: AccountStatus }).status ?? "PENDING";
+      }
+      return token;
     },
-    async session({ session, user }) {
+    async session({ session, token }) {
       if (session.user) {
-        await syncEnvAdminRole(user.id, user.email);
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { role: true, status: true },
-        });
-        session.user.id = user.id;
-        session.user.role = isAdminRole(dbUser?.role, user.email)
-          ? "ADMIN"
-          : (dbUser?.role ?? "USER");
-        session.user.status = dbUser?.status ?? "PENDING";
+        session.user.id = String(token.id ?? "");
+        session.user.role = (token.role as UserRole) ?? "USER";
+        session.user.status = (token.status as AccountStatus) ?? "PENDING";
       }
       return session;
     },

@@ -7,7 +7,8 @@ import {
   Users,
   AppWindow,
   Mail,
-  ClipboardList,
+  Newspaper,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +19,11 @@ const NAV: {
   exact?: boolean;
 }[] = [
   { href: "/admin", label: "概览", icon: LayoutDashboard, exact: true },
-  { href: "/admin/applications", label: "申请", icon: ClipboardList },
   { href: "/admin/users", label: "用户", icon: Users },
+  { href: "/admin/subscribers", label: "资讯订阅", icon: Newspaper },
   { href: "/admin/apps", label: "应用", icon: AppWindow },
   { href: "/admin/emails", label: "邮件", icon: Mail },
+  { href: "/admin/capabilities", label: "检测能力", icon: ShieldCheck },
 ];
 
 export function AdminNav() {
