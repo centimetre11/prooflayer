@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MonitoringToggle } from "@/components/monitoring-toggle";
+import { AppManage } from "@/components/app-manage";
 import { AlertItem, type AlertView } from "@/components/alert-item";
 import { EvidenceVerify } from "@/components/evidence-verify";
 import { PanicPanel } from "@/components/panic-panel";
@@ -104,6 +105,20 @@ export default async function AppDetail({
           </CardContent>
         </Card>
       </div>
+
+      {/* manage app */}
+      <section className="mt-8">
+        <h2 className="mb-3 text-lg font-semibold">Manage this app</h2>
+        <Card>
+          <CardContent className="space-y-3 p-5">
+            <AppManage appId={app.id} appUrl={app.url} appName={app.name} />
+            <p className="text-xs text-[var(--color-muted)]">
+              Re-run an on-demand security check, rename this app, or remove it
+              along with all its scans and evidence.
+            </p>
+          </CardContent>
+        </Card>
+      </section>
 
       {/* alerts */}
       <section className="mt-8">
