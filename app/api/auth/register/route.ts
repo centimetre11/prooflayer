@@ -20,9 +20,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "请检查姓名、邮箱和密码（至少 8 位）" }, { status: 400 });
+      return NextResponse.json({ error: "Please check your name, email, and password (at least 8 characters)" }, { status: 400 });
     }
     console.error("[register]", err);
-    return NextResponse.json({ error: "注册失败" }, { status: 500 });
+    return NextResponse.json({ error: "Registration failed" }, { status: 500 });
   }
 }

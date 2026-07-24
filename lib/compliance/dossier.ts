@@ -60,37 +60,40 @@ export async function buildDossier(appId: string): Promise<Dossier | null> {
 
   const answers: DossierAnswer[] = [
     {
-      question: "是否对含用户数据的数据库表启用了行级安全（RLS）？",
+      question:
+        "Is row-level security (RLS) enabled on database tables that hold user data?",
       answer:
         criticalOpen === 0
-          ? "是。最近一次审计未发现 RLS 缺失或恒真策略的高危问题。"
-          : `存在 ${criticalOpen} 项待处理的高优 RLS/密钥问题，正在按修复闭环处理。`,
-      evidence: `最近审计于 ${latest ? new Date(latest.createdAt).toISOString() : "无"}，共 ${baselines.length} 次基线快照存档。`,
+          ? "Yes. The most recent audit found no high-risk issues such as missing RLS or always-true policies."
+          : `There are ${criticalOpen} outstanding high-priority RLS/secret issues, currently being worked through the remediation loop.`,
+      evidence: `Most recent audit on ${latest ? new Date(latest.createdAt).toISOString() : "none"}, with ${baselines.length} baseline snapshots archived.`,
       status: criticalOpen === 0 ? "satisfied" : "partial",
     },
     {
-      question: "是否对生产环境进行持续的安全监测？",
+      question: "Is production continuously monitored for security?",
       answer: app.monitoringEnabled
-        ? `是。已持续监测约 ${monitoringDays} 天，共 ${heartbeats.length} 条监测心跳记录。`
-        : "监测尚未开启。",
-      evidence: `监测连续性由不可篡改的心跳证据链证明（校验：${chain.ok ? "通过" : "异常"}）。`,
+        ? `Yes. Monitoring has been running continuously for about ${monitoringDays} days, with ${heartbeats.length} monitoring heartbeat records.`
+        : "Monitoring is not yet enabled.",
+      evidence: `Monitoring continuity is proven by a tamper-evident heartbeat evidence chain (verification: ${chain.ok ? "passed" : "anomaly"}).`,
       status: app.monitoringEnabled ? "satisfied" : "gap",
     },
     {
-      question: "发现安全问题后是否有闭环的响应与修复流程？",
+      question:
+        "Is there a closed-loop response and remediation process once a security issue is found?",
       answer:
         remediations.length > 0
-          ? `是。共记录 ${remediations.length} 次修复状态跃迁（发现→确认→修复→复测）。`
-          : "暂无修复记录（可能尚未发现需修复的问题）。",
-      evidence: `所有修复动作带时间戳写入证据链，可逐条复核。`,
+          ? `Yes. A total of ${remediations.length} remediation state transitions have been recorded (detected → acknowledged → fixed → verified).`
+          : "No remediation records yet (there may not have been any issues requiring remediation).",
+      evidence: `Every remediation action is written to the evidence chain with a timestamp and can be reviewed item by item.`,
       status: remediations.length > 0 ? "satisfied" : "partial",
     },
     {
-      question: "安全证据是否防篡改、可供第三方核验？",
+      question:
+        "Is the security evidence tamper-proof and verifiable by a third party?",
       answer: chain.ok
-        ? `是。共 ${chain.length} 条证据记录构成哈希链，任意篡改都会被校验发现。`
-        : "证据链校验发现异常，需排查。",
-      evidence: `chain_hash = sha256(prev_hash ‖ payload_hash ‖ created_at)。`,
+        ? `Yes. A total of ${chain.length} evidence records form a hash chain, so any tampering will be caught during verification.`
+        : "Evidence chain verification found an anomaly that needs investigation.",
+      evidence: `chain_hash = sha256(prev_hash ‖ payload_hash ‖ created_at).`,
       status: chain.ok ? "satisfied" : "gap",
     },
   ];
@@ -118,13 +121,13 @@ function summarize(type: string, payload: unknown): string {
   const p = (payload ?? {}) as Record<string, unknown>;
   switch (type) {
     case "BASELINE":
-      return `安全基线快照，评分 ${p.score ?? "-"}`;
+      return `Security baseline snapshot, score ${p.score ?? "-"}`;
     case "HEARTBEAT":
-      return "监测心跳";
+      return "Monitoring heartbeat";
     case "REMEDIATION":
-      return `修复：${p.fingerprint ?? ""} ${p.from ?? ""}→${p.to ?? ""}`;
+      return `Remediation: ${p.fingerprint ?? ""} ${p.from ?? ""}→${p.to ?? ""}`;
     case "INCIDENT":
-      return "事故记录";
+      return "Incident record";
     default:
       return type;
   }
@@ -138,19 +141,19 @@ export function renderDossierHtml(d: Dossier): string {
       <div class="qa">
         <div class="q">${a.question}
           <span class="tag ${a.status}">${
-            a.status === "satisfied" ? "已满足" : a.status === "partial" ? "部分满足" : "待补齐"
+            a.status === "satisfied" ? "Satisfied" : a.status === "partial" ? "Partially satisfied" : "Gap"
           }</span>
         </div>
         <div class="a">${a.answer}</div>
-        <div class="e">证据：${a.evidence}</div>
+        <div class="e">Evidence: ${a.evidence}</div>
       </div>`
     )
     .join("");
   const tl = d.timeline
     .map((t) => `<li><code>${t.at}</code> · ${t.type} · ${t.summary}</li>`)
     .join("");
-  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
-  <title>麋鹿洞察 · 尽调应答包 · ${d.app.name}</title>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8">
+  <title>InsightElk · Due-Diligence Response Pack · ${d.app.name}</title>
   <style>
     body{font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:820px;margin:40px auto;padding:0 20px;color:#111;line-height:1.6}
     h1{margin-bottom:4px} .sub{color:#666;font-size:13px;margin-bottom:24px}
@@ -166,18 +169,18 @@ export function renderDossierHtml(d: Dossier): string {
     ul{font-size:13px;color:#333} code{color:#2563eb}
     .foot{margin-top:30px;color:#999;font-size:12px;border-top:1px solid #eee;padding-top:12px}
   </style></head><body>
-  <h1>安全尽职调查应答包</h1>
-  <div class="sub">${d.app.name} · ${d.app.url} · 生成于 ${d.generatedAt}</div>
+  <h1>Security Due-Diligence Response Pack</h1>
+  <div class="sub">${d.app.name} · ${d.app.url} · Generated on ${d.generatedAt}</div>
   <div class="grid">
-    <div class="stat"><b>${d.scanCount}</b>次安全扫描</div>
-    <div class="stat"><b>${d.monitoringDays}</b>天监测连续性</div>
-    <div class="stat"><b>${d.evidenceCount}</b>条证据记录</div>
-    <div class="stat"><b>${d.chainOk ? "通过" : "异常"}</b>证据链校验</div>
+    <div class="stat"><b>${d.scanCount}</b>security scans</div>
+    <div class="stat"><b>${d.monitoringDays}</b>days of monitoring continuity</div>
+    <div class="stat"><b>${d.evidenceCount}</b>evidence records</div>
+    <div class="stat"><b>${d.chainOk ? "Passed" : "Anomaly"}</b>evidence chain verification</div>
   </div>
-  <h2>合规问答（SIG-Lite 精简版）</h2>
+  <h2>Compliance Q&A (SIG-Lite)</h2>
   ${rows}
-  <h2>证据时间轴（近 40 条）</h2>
+  <h2>Evidence timeline (last 40 entries)</h2>
   <ul>${tl}</ul>
-  <div class="foot">本应答包由麋鹿洞察依据不可篡改证据链自动生成。麋鹿洞察仅提供检测与存证工具，非安全担保方；本材料用于尽职调查参考，不构成安全保证。</div>
+  <div class="foot">This response pack is automatically generated by InsightElk from a tamper-evident evidence chain. InsightElk only provides detection and record-keeping tools and is not a security guarantor; this material is intended for due-diligence reference and does not constitute a security warranty.</div>
   </body></html>`;
 }

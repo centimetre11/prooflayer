@@ -6,12 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, ShieldAlert, CheckCircle2 } from "lucide-react";
 
 const STAGES = [
-  "正在用真实浏览器打开你的应用…",
-  "正在抓取前端代码与运行时请求…",
-  "正在检查你的数据库门锁（RLS）…",
-  "正在扫描泄露的密钥与密码…",
-  "正在探测 Auth 与暴露面配置…",
-  "正在生成白话报告…",
+  "Opening your app in a real browser…",
+  "Capturing frontend code and runtime requests…",
+  "Checking your database door locks (RLS)…",
+  "Scanning for leaked keys and passwords…",
+  "Probing Auth and exposure surface configuration…",
+  "Generating a plain-language report…",
 ];
 
 export default function ScanProgress() {
@@ -37,7 +37,7 @@ export default function ScanProgress() {
         } else if (data.status === "FAILED") {
           clearInterval(poll);
           clearInterval(stageTimer);
-          setFailed(data.error ?? "扫描失败");
+          setFailed(data.error ?? "Scan failed");
         }
       } catch {
         /* keep polling */
@@ -57,19 +57,19 @@ export default function ScanProgress() {
           {failed ? (
             <>
               <ShieldAlert size={40} className="mx-auto text-[var(--color-critical)]" />
-              <h1 className="mt-4 text-xl font-semibold">扫描未能完成</h1>
+              <h1 className="mt-4 text-xl font-semibold">Scan could not be completed</h1>
               <p className="mt-2 text-sm text-[var(--color-muted)]">{failed}</p>
               <button
                 onClick={() => router.push("/")}
                 className="mt-6 text-sm text-[var(--color-primary)] hover:underline"
               >
-                返回重试
+                Go back and retry
               </button>
             </>
           ) : (
             <>
               <Loader2 size={40} className="mx-auto animate-spin text-[var(--color-primary)]" />
-              <h1 className="mt-4 text-xl font-semibold">正在体检你的应用</h1>
+              <h1 className="mt-4 text-xl font-semibold">Running a security check on your app</h1>
               <p className="mt-2 min-h-6 text-[var(--color-muted)]">{STAGES[stage]}</p>
               <div className="mt-6 space-y-2 text-left">
                 {STAGES.map((s, i) => (

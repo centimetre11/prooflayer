@@ -20,12 +20,12 @@ export default async function LoginPage() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <LogIn size={18} /> 登录控制台
+            <LogIn size={18} /> Sign in to console
           </CardTitle>
-          <CardDescription>使用邮箱和密码登录。扫描应用仍可不登录使用。</CardDescription>
+          <CardDescription>Sign in with your email and password. You can still scan apps without signing in.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<p className="text-sm text-[var(--color-muted)]">加载中…</p>}>
+          <Suspense fallback={<p className="text-sm text-[var(--color-muted)]">Loading…</p>}>
             <LoginForm />
           </Suspense>
         </CardContent>

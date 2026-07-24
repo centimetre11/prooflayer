@@ -17,9 +17,9 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">用户</h2>
+        <h2 className="text-xl font-semibold">Users</h2>
         <p className="text-sm text-[var(--color-muted)]">
-          管理角色与订阅档位（共 {users.length} 人）
+          Manage roles and subscription tiers ({users.length} total)
         </p>
       </div>
 
@@ -29,7 +29,7 @@ export default async function AdminUsersPage() {
             <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium">{u.email ?? "无邮箱"}</span>
+                  <span className="font-medium">{u.email ?? "No email"}</span>
                   <Badge
                     className={
                       u.role === "ADMIN"
@@ -53,8 +53,8 @@ export default async function AdminUsersPage() {
                   </Badge>
                 </div>
                 <p className="text-xs text-[var(--color-muted)]">
-                  {u.name ?? "未命名"} · {u._count.apps} 应用 ·{" "}
-                  {u._count.emailDeliveries} 封邮件 · 加入于{" "}
+                  {u.name ?? "Unnamed"} · {u._count.apps} apps ·{" "}
+                  {u._count.emailDeliveries} emails · joined{" "}
                   {formatDate(u.createdAt)}
                 </p>
               </div>

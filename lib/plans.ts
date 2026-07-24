@@ -3,9 +3,9 @@ import type { Tier } from "@prisma/client";
 export interface Plan {
   tier: Tier;
   name: string;
-  /** 原价展示（划线） */
+  /** original (strikethrough) price */
   price: string;
-  /** 限时价；付费档当前统一限时 $0 */
+  /** limited-time price; paid tiers are currently all a limited-time $0 */
   promoPrice?: string;
   priceNote: string;
   appLimit: number;
@@ -15,24 +15,24 @@ export interface Plan {
   highlight?: boolean;
 }
 
-/** 早鸟限时：付费档标原价，成交价暂为 $0 */
-export const PROMO_LABEL = "限时早鸟";
+/** Early-bird limited time: paid tiers show the original price, deal price is $0 for now */
+export const PROMO_LABEL = "Limited early-bird";
 
 export const PLANS: Plan[] = [
   {
     tier: "FREE",
     name: "Free",
     price: "$0",
-    priceNote: "永久免费",
+    priceNote: "Free forever",
     appLimit: 1,
     retentionDays: 7,
     canExport: false,
     features: [
-      "1 个应用",
-      "一次性体检 + 每周被动监测",
-      "最近 7 天快照",
-      "事故诊断报告（关键细节打码）",
-      "只读分享链接",
+      "1 app",
+      "One-time security check + weekly passive monitoring",
+      "Last 7 days of snapshots",
+      "Incident diagnostic report (key details redacted)",
+      "Read-only share link",
     ],
   },
   {
@@ -40,16 +40,16 @@ export const PLANS: Plan[] = [
     name: "Indie",
     price: "$19",
     promoPrice: "$0",
-    priceNote: "每月",
+    priceNote: "per month",
     appLimit: 3,
     retentionDays: 30,
     canExport: true,
     features: [
-      "3 个应用",
-      "每日实时监测",
-      "完整事故报告 + 修复指引",
-      "深度 RLS 审计",
-      "尽调应答包导出",
+      "3 apps",
+      "Daily real-time monitoring",
+      "Full incident report + remediation guide",
+      "Deep RLS audit",
+      "Due diligence response package export",
     ],
   },
   {
@@ -57,17 +57,17 @@ export const PLANS: Plan[] = [
     name: "Team",
     price: "$99",
     promoPrice: "$0",
-    priceNote: "每月",
+    priceNote: "per month",
     appLimit: 15,
     retentionDays: 365,
     canExport: true,
     highlight: true,
     features: [
-      "15 个应用",
-      "合规档案（证据链自动生成）",
-      "多渠道告警",
-      "365 天数据保留",
-      "SOC2 预审（差距分析）",
+      "15 apps",
+      "Compliance Dossier (evidence chain auto-generated)",
+      "Multi-channel alerts",
+      "365-day data retention",
+      "SOC2 pre-audit (gap analysis)",
     ],
   },
   {
@@ -75,16 +75,16 @@ export const PLANS: Plan[] = [
     name: "Enterprise",
     price: "$2,000+",
     promoPrice: "$0",
-    priceNote: "每月起",
+    priceNote: "from /month",
     appLimit: 9999,
     retentionDays: 3650,
     canExport: true,
     features: [
-      "不限应用数",
-      "SSO、审计导出",
-      "档案白标（客户尽调用）",
+      "Unlimited apps",
+      "SSO, audit export",
+      "White-labeled dossier (for customer due diligence)",
       "SLA",
-      "专属支持",
+      "Dedicated support",
     ],
   },
 ];

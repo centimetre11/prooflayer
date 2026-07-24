@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* 麋鹿洞察：林夜底色 + 角金主色 + 苔绿强调 */
+  /* InsightElk: forest-night base + antler-gold primary + moss-green accent */
   --color-background: #0b1210;
   --color-surface: #121a17;
   --color-surface-2: #1a2420;

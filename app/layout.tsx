@@ -20,9 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME} — 为 vibe 应用提供持续尽责的证明`,
+  title: `${BRAND_NAME} — Proof of continuous due diligence for vibe-coded apps`,
   description:
-    "AI 生成应用的合规档案 + 保险。从免费安全体检切入，以治理订阅和合规档案为收入主体。",
+    "The Compliance Dossier + insurance for AI-generated apps. Start with a free security check, with governance subscriptions and the Compliance Dossier as the core of revenue.",
 };
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="zh-CN"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
@@ -64,25 +64,25 @@ async function SiteHeader() {
         </Link>
         <nav className="flex items-center gap-3 text-sm text-[var(--color-muted)] sm:gap-5">
           <Link href="/#how" className="hidden hover:text-[var(--color-foreground)] sm:block">
-            工作原理
+            How it works
           </Link>
           <Link href="/pricing" className="hover:text-[var(--color-foreground)]">
-            定价
+            Pricing
           </Link>
           {showAdmin ? (
             <Link
               href="/admin"
               className="rounded-lg border border-[var(--color-primary)] px-3 py-1.5 font-medium text-[var(--color-primary)] hover:brightness-110"
             >
-              管理后台
+              Admin
             </Link>
           ) : loggedIn ? (
             <Link href="/dashboard" className="hover:text-[var(--color-foreground)]">
-              控制台
+              Console
             </Link>
           ) : (
             <Link href="/register" className="hidden hover:text-[var(--color-foreground)] sm:block">
-              注册
+              Sign up
             </Link>
           )}
           {loggedIn ? (
@@ -97,7 +97,7 @@ async function SiteHeader() {
               href="/login"
               className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[var(--color-foreground)] hover:border-[var(--color-primary)]"
             >
-              登录
+              Sign in
             </Link>
           )}
         </nav>
@@ -111,10 +111,10 @@ function SiteFooter() {
     <footer className="border-t border-[var(--color-border)] py-8 text-sm text-[var(--color-muted)]">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 sm:flex-row sm:items-center sm:justify-between">
         <p>
-          {BRAND_NAME} · 为 vibe coding 长成业务的应用提供持续尽责的证明
+          {BRAND_NAME} · Proof of continuous due diligence for apps that grow out of vibe coding
         </p>
         <p className="text-xs">
-          仅提供检测工具，非安全担保方 · 默认只告警不阻断
+          Detection tools only, not a security guarantor · Alerts only, never blocks, by default
         </p>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 麋鹿洞察（InsightElk）deploy script
+# InsightElk deploy script
 #
 # Conventions:
 #   - Server directory:      /opt/<app-name>   (default: /opt/prooflayer)
@@ -169,7 +169,7 @@ AUTH_URL=$APP_PUBLIC_URL
 AUTH_SECRET=\$AUTH_SECRET
 
 EMAIL_PROVIDER=smtp
-EMAIL_FROM=麋鹿洞察 <admin@insightelk.com>
+EMAIL_FROM=InsightElk <admin@insightelk.com>
 SMTP_HOST=smtp.exmail.qq.com
 SMTP_PORT=465
 SMTP_SECURE=true

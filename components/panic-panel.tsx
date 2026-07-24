@@ -37,7 +37,7 @@ export function PanicPanel({
       const res = await fetch(`/api/export/${appId}`);
       if (res.status === 402) {
         const data = await res.json();
-        setUpgrade(data.message ?? "升级方案即可导出");
+        setUpgrade(data.message ?? "Upgrade your plan to export");
         return;
       }
       if (!res.ok) return;
@@ -58,13 +58,13 @@ export function PanicPanel({
       <CardContent className="p-5">
         <div className="flex items-center gap-2">
           <Sparkles size={18} className="text-[var(--color-primary)]" />
-          <h3 className="font-semibold">恐慌时刻 · 尽调应答包</h3>
+          <h3 className="font-semibold">Panic moment · Due diligence response package</h3>
         </div>
         <p className="mt-2 text-sm text-[var(--color-muted)]">
-          你过去 <b className="text-[var(--color-foreground)]">{monitoringDays}</b> 天有{" "}
-          <b className="text-[var(--color-foreground)]">{scanCount}</b> 次扫描、
+          Over the past <b className="text-[var(--color-foreground)]">{monitoringDays}</b> days you have{" "}
+          <b className="text-[var(--color-foreground)]">{scanCount}</b> scans and{" "}
           <b className="text-[var(--color-foreground)]">{evidenceCount}</b>{" "}
-          条证据记录可用于应答。出事故或客户尽调时，一键生成自证清白的材料。
+          evidence records available for your response. When an incident happens or a customer runs due diligence, generate the materials to prove your compliance in one click.
         </p>
 
         <div className="relative mt-4 space-y-2">
@@ -85,7 +85,7 @@ export function PanicPanel({
           {!canExport && (
             <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-24 items-end justify-center rounded-b-lg bg-gradient-to-t from-[var(--color-surface)] to-transparent">
               <span className="pointer-events-auto mb-2 inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs text-[var(--color-muted)]">
-                <Lock size={12} /> 完整应答包与导出需付费方案
+                <Lock size={12} /> The full response package and export require a paid plan
               </span>
             </div>
           )}
@@ -94,10 +94,10 @@ export function PanicPanel({
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button onClick={exportDossier} disabled={loading}>
             {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} />}
-            导出尽调应答包
+            Export due diligence response package
           </Button>
           <span className="text-xs text-[var(--color-muted)]">
-            查看免费 · 导出/分享付费（把既有证据变现，而非购买不确定的保护）
+            Free to view · Paid to export/share (monetize the evidence you already have, rather than buying uncertain protection)
           </span>
         </div>
 
@@ -105,7 +105,7 @@ export function PanicPanel({
           <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-[var(--color-primary)]/40 bg-[var(--color-surface-2)] p-3 text-sm">
             <span>{upgrade}</span>
             <Button asChild size="sm">
-              <Link href="/pricing">升级方案</Link>
+              <Link href="/pricing">Upgrade plan</Link>
             </Button>
           </div>
         )}

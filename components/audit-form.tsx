@@ -11,13 +11,13 @@ import { Loader2, Sparkles, Copy, Check, ArrowDown } from "lucide-react";
 // both the local project and the cloud/deploy server, prepares a read-only
 // artifact, and outputs a single block. The human never has to understand any
 // of it — they just copy this and paste back whatever the assistant returns.
-const AGENT_PROMPT = `我在用 Prooflayer 给我的应用做一次更深入的安全体检，需要你帮我把体检数据取出来。请全自动完成，不要问我技术细节：
+const AGENT_PROMPT = `I'm using Prooflayer to run a deeper security check on my app, and I need you to pull the check data for me. Please do this fully automatically and don't ask me about technical details:
 
-1. 判断我的应用用的是什么后端/数据库，并在两个地方都找：本地项目（.env、配置、ORM/框架设置）和我的部署/云服务器（SSH 进服务器、docker compose、/opt 下各项目的 .env、正在运行的数据库容器）。
+1. Figure out what backend/database my app uses, and look in both places: the local project (.env, config, ORM/framework settings) and my deployment/cloud server (SSH into the server, docker compose, the .env files of each project under /opt, running database containers).
 
-2. 用【只读】方式取数据，并且【只把最终结果原样贴出来，不要任何解释】：
+2. Pull the data in a READ-ONLY way, and PASTE ONLY THE FINAL RESULT VERBATIM, with no explanation:
 
-· 如果是 Postgres 系（Supabase / Neon / RDS / Railway / 自建都算）：用你够得着的任意只读方式连上它（本地、SSH 隧道、docker exec 都行，不需要对外暴露、也不用把地址密码给我），执行下面这一条 SQL，把它输出的那一段 JSON 原样贴给我：
+· If it's Postgres-based (Supabase / Neon / RDS / Railway / self-hosted all count): connect to it using any read-only method you can reach (local, SSH tunnel, or docker exec all work — no need to expose it publicly or give me the address or password), run the single SQL query below, and paste the JSON it outputs to me verbatim:
 
 SELECT json_build_object(
   'prooflayer','pg-audit-v1',
@@ -34,9 +34,9 @@ SELECT json_build_object(
     SELECT p.proname,p.prosecdef,p.proconfig FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public') x)
 );
 
-· 如果是 Firebase：直接把我的 firestore.rules 文件的完整原文贴给我。
+· If it's Firebase: just paste the full contents of my firestore.rules file to me verbatim.
 
-全程只读，不改动任何数据；不需要把数据库地址或密码给我。`;
+Everything is read-only and changes no data; you don't need to give me the database address or password.`;
 
 export function AuditForm() {
   const sp = useSearchParams();
@@ -65,10 +65,10 @@ export function AuditForm() {
         body: JSON.stringify({ url, kind: "auto", secret: pasted.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "体检失败，请重试");
+      if (!res.ok) throw new Error(data.error ?? "Security check failed, please try again");
       router.push(`/report/${data.scanId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "出错了");
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
     }
   }
@@ -77,18 +77,18 @@ export function AuditForm() {
     <div className="mx-auto max-w-2xl px-5 py-12">
       <div className="mb-4">
         <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs text-[var(--color-muted)]">
-          第 2 步 · 更深一层体检
+          Step 2 · A deeper security check
         </span>
       </div>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Sparkles size={18} className="text-[var(--color-accent)]" /> 让你的 AI 助手替你搞定
+            <Sparkles size={18} className="text-[var(--color-accent)]" /> Let your AI assistant handle it for you
           </CardTitle>
           <CardDescription>
-            有些风险藏在应用内部，外部扫描看不到。你不用懂任何技术——
-            把下面这段交给你正在用的 AI（Cursor / Claude Code / Codex 等），
-            它会自动查好、准备好，你把它给你的结果贴回来就行。<b>全程只读，用完即焚。</b>
+            Some risks hide inside your app where external scans can&apos;t see them. You don&apos;t need any technical knowledge—
+            hand the text below to the AI you&apos;re already using (Cursor / Claude Code / Codex, etc.),
+            and it will automatically gather and prepare everything. Just paste back whatever it returns to you. <b>Read-only throughout, and discarded right after use.</b>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -96,8 +96,8 @@ export function AuditForm() {
             {/* Step 1 — copy */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium">① 复制这段，发给你的 AI 助手</span>
-                <span className="text-[11px] text-[var(--color-muted)]">不用看懂，点复制就行</span>
+                <span className="text-sm font-medium">① Copy this and send it to your AI assistant</span>
+                <span className="text-[11px] text-[var(--color-muted)]">No need to understand it — just click copy</span>
               </div>
               <button
                 type="button"
@@ -107,15 +107,15 @@ export function AuditForm() {
                 <span className="flex items-center gap-3">
                   <Sparkles size={20} className="text-[var(--color-primary)]" />
                   <span>
-                    <span className="block text-sm font-semibold">复制给 AI 的指令</span>
+                    <span className="block text-sm font-semibold">The instruction to copy for your AI</span>
                     <span className="block text-xs text-[var(--color-muted)]">
-                      让它自动准备好体检所需的一切
+                      Let it automatically prepare everything the security check needs
                     </span>
                   </span>
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-primary)] px-3 py-2 text-sm font-medium text-white">
                   {copied ? <Check size={16} /> : <Copy size={16} />}
-                  {copied ? "已复制" : "复制"}
+                  {copied ? "Copied" : "Copy"}
                 </span>
               </button>
             </div>
@@ -127,13 +127,13 @@ export function AuditForm() {
             {/* Step 2 — paste */}
             <div>
               <label className="mb-2 block text-sm font-medium">
-                ② 把 AI 回给你的内容贴到这里
+                ② Paste what the AI returns to you here
               </label>
               <textarea
                 value={pasted}
                 onChange={(e) => setPasted(e.target.value)}
                 rows={5}
-                placeholder="把 AI 助手返回的那一段原样贴进来即可"
+                placeholder="Just paste in the block your AI assistant returns, verbatim"
                 className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 font-mono text-xs outline-none focus:border-[var(--color-primary)]"
               />
             </div>
@@ -143,10 +143,10 @@ export function AuditForm() {
             <Button type="submit" disabled={loading || pasted.trim().length < 8} className="w-full">
               {loading ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" /> 正在体检…
+                  <Loader2 size={16} className="animate-spin" /> Running security check…
                 </>
               ) : (
-                "开始体检"
+                "Start security check"
               )}
             </Button>
           </form>
@@ -154,7 +154,7 @@ export function AuditForm() {
       </Card>
 
       <p className="mt-4 text-center text-xs text-[var(--color-muted)]">
-        只读检查 · 不改动你的任何数据 · 用完即焚，不留存
+        Read-only check · Changes none of your data · Discarded after use, never retained
       </p>
     </div>
   );

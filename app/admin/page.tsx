@@ -77,43 +77,43 @@ export default async function AdminOverviewPage() {
     }[];
   }[] = [
     {
-      title: "用户与增长",
+      title: "Users & Growth",
       stats: [
-        { label: "活跃用户", value: userCount, delta: `+${users7d} / 7天`, href: "/admin/users", icon: Users },
-        { label: "资讯订阅", value: subscriberCount, delta: `+${subscribers7d} / 7天`, href: "/admin/subscribers", icon: Newspaper },
+        { label: "Active users", value: userCount, delta: `+${users7d} / 7d`, href: "/admin/users", icon: Users },
+        { label: "Newsletter subscribers", value: subscriberCount, delta: `+${subscribers7d} / 7d`, href: "/admin/subscribers", icon: Newspaper },
       ],
     },
     {
-      title: "业务健康",
+      title: "Business Health",
       stats: [
-        { label: "受监测应用", value: appCount, href: "/admin/apps", icon: AppWindow },
-        { label: "未关闭告警", value: openAlerts, href: "/admin/apps", icon: Bell, tone: openAlerts > 0 ? "warn" : undefined },
-        { label: "7 日扫描", value: scans7d, href: "/admin/apps", icon: ScanLine },
-        { label: "检测能力已落地", value: capabilityTotals.done, href: "/admin/capabilities", icon: ShieldCheck },
+        { label: "Monitored apps", value: appCount, href: "/admin/apps", icon: AppWindow },
+        { label: "Open alerts", value: openAlerts, href: "/admin/apps", icon: Bell, tone: openAlerts > 0 ? "warn" : undefined },
+        { label: "Scans (7d)", value: scans7d, href: "/admin/apps", icon: ScanLine },
+        { label: "Capabilities shipped", value: capabilityTotals.done, href: "/admin/capabilities", icon: ShieldCheck },
       ],
     },
     {
-      title: "系统与邮件",
+      title: "System & Email",
       stats: [
-        { label: "7 日邮件投递", value: emails7d, href: "/admin/emails", icon: Mail },
-        { label: "30 日失败邮件", value: failedEmails, href: "/admin/emails", icon: Mail, tone: failedEmails > 0 ? "warn" : undefined },
+        { label: "Email deliveries (7d)", value: emails7d, href: "/admin/emails", icon: Mail },
+        { label: "Failed emails (30d)", value: failedEmails, href: "/admin/emails", icon: Mail, tone: failedEmails > 0 ? "warn" : undefined },
       ],
     },
   ];
 
   const quickActions = [
-    { label: "管理用户与权限", href: "/admin/users", icon: Users },
-    { label: "查看资讯订阅名单", href: "/admin/subscribers", icon: Newspaper },
-    { label: "邮件投递日志 / 发周报", href: "/admin/emails", icon: Mail },
-    { label: "检测能力清单", href: "/admin/capabilities", icon: ShieldCheck },
+    { label: "Manage users & permissions", href: "/admin/users", icon: Users },
+    { label: "View newsletter subscribers", href: "/admin/subscribers", icon: Newspaper },
+    { label: "Email delivery log / send digest", href: "/admin/emails", icon: Mail },
+    { label: "Detection capability list", href: "/admin/capabilities", icon: ShieldCheck },
   ];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">运营概览</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Operations Overview</h1>
         <p className="text-sm text-[var(--color-muted)]">
-          管理用户、订阅、内容与系统健康 —— 这里不做产品功能，只做管理。
+          Manage users, subscriptions, content, and system health — this is for administration only, not product features.
         </p>
       </div>
 
@@ -159,7 +159,7 @@ export default async function AdminOverviewPage() {
       ))}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-[var(--color-muted)]">快捷管理</h2>
+        <h2 className="text-sm font-semibold text-[var(--color-muted)]">Quick Actions</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((a) => {
             const Icon = a.icon;
@@ -183,21 +183,21 @@ export default async function AdminOverviewPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>最新注册用户</CardTitle>
+            <CardTitle>Newest Users</CardTitle>
             <Link href="/admin/users" className="text-xs text-[var(--color-primary)] hover:underline">
-              全部
+              View all
             </Link>
           </CardHeader>
           <CardContent className="space-y-3">
             {recentUsers.length === 0 ? (
-              <p className="text-sm text-[var(--color-muted)]">暂无用户</p>
+              <p className="text-sm text-[var(--color-muted)]">No users yet</p>
             ) : (
               recentUsers.map((u) => (
                 <div key={u.id} className="flex items-start justify-between gap-3 text-sm">
                   <div className="min-w-0">
                     <div className="truncate font-medium">{u.email}</div>
                     <div className="text-xs text-[var(--color-muted)]">
-                      {u.subscription?.tier ?? "FREE"} · {u._count.apps} 应用
+                      {u.subscription?.tier ?? "FREE"} · {u._count.apps} apps
                     </div>
                   </div>
                   <div className="shrink-0 text-xs text-[var(--color-muted)]">
@@ -211,14 +211,14 @@ export default async function AdminOverviewPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>最近扫描</CardTitle>
+            <CardTitle>Recent Scans</CardTitle>
             <Link href="/admin/apps" className="text-xs text-[var(--color-primary)] hover:underline">
-              全部
+              View all
             </Link>
           </CardHeader>
           <CardContent className="space-y-3">
             {recentScans.length === 0 ? (
-              <p className="text-sm text-[var(--color-muted)]">暂无扫描</p>
+              <p className="text-sm text-[var(--color-muted)]">No scans yet</p>
             ) : (
               recentScans.map((s) => (
                 <div key={s.id} className="flex items-start justify-between gap-3 text-sm">
@@ -226,7 +226,7 @@ export default async function AdminOverviewPage() {
                     <div className="truncate font-medium">{s.app?.name ?? s.url}</div>
                     <div className="text-xs text-[var(--color-muted)]">
                       {s.kind} · {s.status}
-                      {s.score != null ? ` · 评分 ${s.score}` : ""}
+                      {s.score != null ? ` · score ${s.score}` : ""}
                     </div>
                   </div>
                   <div className="shrink-0 text-xs text-[var(--color-muted)]">
@@ -240,14 +240,14 @@ export default async function AdminOverviewPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>最近邮件</CardTitle>
+            <CardTitle>Recent Emails</CardTitle>
             <Link href="/admin/emails" className="text-xs text-[var(--color-primary)] hover:underline">
-              全部
+              View all
             </Link>
           </CardHeader>
           <CardContent className="space-y-3">
             {recentEmails.length === 0 ? (
-              <p className="text-sm text-[var(--color-muted)]">暂无投递记录</p>
+              <p className="text-sm text-[var(--color-muted)]">No delivery records yet</p>
             ) : (
               recentEmails.map((e) => (
                 <div key={e.id} className="flex items-start justify-between gap-3 text-sm">

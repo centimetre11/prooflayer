@@ -1,4 +1,4 @@
-// 麋鹿洞察（InsightElk）— Vibe 应用治理套件 data model
+// InsightElk — governance suite data model for vibe-coded apps
 // Governance / compliance layer for AI-generated (vibe coded) apps.
 
 generator client {

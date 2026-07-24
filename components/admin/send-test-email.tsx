@@ -22,10 +22,10 @@ export function SendTestEmail({ defaultTo }: { defaultTo?: string }) {
       status?: string;
     };
     if (!res.ok) {
-      setMsg(data.error ?? "发送失败");
+      setMsg(data.error ?? "Send failed");
       return;
     }
-    setMsg(`已记录投递：${data.status}`);
+    setMsg(`Delivery recorded: ${data.status}`);
     startTransition(() => router.refresh());
   }
 
@@ -35,11 +35,11 @@ export function SendTestEmail({ defaultTo }: { defaultTo?: string }) {
         type="email"
         value={to}
         onChange={(e) => setTo(e.target.value)}
-        placeholder="收件人邮箱"
+        placeholder="Recipient email"
         className="h-10 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
       />
       <Button size="md" variant="secondary" disabled={pending || !to} onClick={send}>
-        发送测试邮件
+        Send test email
       </Button>
       {msg ? <p className="text-xs text-[var(--color-muted)] sm:ml-2">{msg}</p> : null}
     </div>

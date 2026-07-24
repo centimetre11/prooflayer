@@ -24,9 +24,9 @@ export async function GET(
   if (!plan.canExport) {
     return NextResponse.json(
       {
-        error: "导出尽调应答包需要付费方案",
+        error: "Exporting the due diligence response package requires a paid plan",
         upgrade: true,
-        message: "你的证据已就绪。升级到 Indie 及以上即可导出/分享给客户与投资人。",
+        message: "Your evidence is ready. Upgrade to Indie or above to export/share it with customers and investors.",
       },
       { status: 402 }
     );

@@ -17,10 +17,10 @@ export default async function RegisterPage() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <UserPlus size={18} /> 注册控制台账号
+            <UserPlus size={18} /> Create a console account
           </CardTitle>
           <CardDescription>
-            注册后可管理应用、开启监测与接收告警。若只想收产品资讯，请用首页「登记邮箱」。
+            Once registered, you can manage apps, enable monitoring, and receive alerts. If you only want product updates, use “Subscribe with email” on the home page.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -32,7 +32,7 @@ export function UserActions({
     });
     if (!res.ok) {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
-      setError(data.error ?? "保存失败");
+      setError(data.error ?? "Save failed");
       return;
     }
     startTransition(() => router.refresh());
@@ -71,7 +71,7 @@ export function UserActions({
           disabled={pending}
           onClick={() => save({ role: currentRole, tier: currentTier })}
         >
-          保存
+          Save
         </Button>
       </div>
       {error ? <p className="text-xs text-[var(--color-critical)]">{error}</p> : null}

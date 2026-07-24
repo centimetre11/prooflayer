@@ -25,7 +25,7 @@ export default async function AdminLayout({
               <BrandMark size={18} />
             </span>
             <div className="leading-tight">
-              <div className="text-sm font-semibold">InsightElk 管理后台</div>
+              <div className="text-sm font-semibold">InsightElk Admin</div>
               <div className="text-[10px] uppercase tracking-wider text-[var(--color-muted)]">
                 Super Admin Console
               </div>
@@ -36,7 +36,7 @@ export default async function AdminLayout({
               href="/"
               className="hidden items-center gap-1 text-[var(--color-muted)] hover:text-[var(--color-foreground)] sm:flex"
             >
-              查看站点 <ExternalLink size={13} />
+              View site <ExternalLink size={13} />
             </Link>
             <span className="hidden max-w-[14rem] truncate text-xs text-[var(--color-muted)] sm:inline">
               {session.user.email}

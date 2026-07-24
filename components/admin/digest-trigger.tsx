@@ -19,11 +19,11 @@ export function DigestTrigger() {
       failed?: number;
     };
     if (!res.ok) {
-      setMsg(data.error ?? "触发失败");
+      setMsg(data.error ?? "Trigger failed");
       return;
     }
     setMsg(
-      `周报完成：发送 ${data.sent ?? 0} · 跳过 ${data.skipped ?? 0} · 失败 ${data.failed ?? 0}`
+      `Digest complete: sent ${data.sent ?? 0} · skipped ${data.skipped ?? 0} · failed ${data.failed ?? 0}`
     );
     startTransition(() => router.refresh());
   }
@@ -31,7 +31,7 @@ export function DigestTrigger() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <Button size="sm" variant="secondary" disabled={pending} onClick={run}>
-        立即发送周报
+        Send digest now
       </Button>
       {msg ? <p className="text-xs text-[var(--color-muted)]">{msg}</p> : null}
     </div>

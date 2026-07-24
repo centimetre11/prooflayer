@@ -41,7 +41,7 @@ export function MonitoringToggle({
       }`}
     >
       {enabled ? <Bell size={15} /> : <BellOff size={15} />}
-      {enabled ? "每日监测：开" : "每日监测：关"}
+      {enabled ? "Daily monitoring: On" : "Daily monitoring: Off"}
     </button>
   );
 }

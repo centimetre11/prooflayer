@@ -25,6 +25,6 @@ export async function POST() {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
     console.error("[admin/emails/digest]", err);
-    return NextResponse.json({ error: "周报发送失败" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to send digest" }, { status: 500 });
   }
 }

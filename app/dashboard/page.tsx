@@ -35,14 +35,14 @@ export default async function Dashboard() {
     <div className="mx-auto max-w-5xl px-5 py-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">控制台</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Console</h1>
           <p className="text-sm text-[var(--color-muted)]">
-            {session.user.email} · {plan.name} 方案 · {apps.length}/{plan.appLimit} 应用
+            {session.user.email} · {plan.name} plan · {apps.length}/{plan.appLimit} apps
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="secondary" size="sm">
-            <Link href="/pricing">升级方案</Link>
+            <Link href="/pricing">Upgrade plan</Link>
           </Button>
           <SignOutButton className="inline-flex h-8 items-center rounded-lg border border-[var(--color-border)] px-3 text-sm text-[var(--color-foreground)] hover:border-[var(--color-primary)] disabled:opacity-50" />
         </div>
@@ -50,16 +50,16 @@ export default async function Dashboard() {
 
       <Card className="mt-6">
         <CardContent className="p-5">
-          <h2 className="mb-3 text-sm font-medium">体检一个新应用</h2>
+          <h2 className="mb-3 text-sm font-medium">Run a security check on a new app</h2>
           <ScanForm size="md" />
         </CardContent>
       </Card>
 
-      <h2 className="mb-3 mt-8 text-lg font-semibold">我的应用</h2>
+      <h2 className="mb-3 mt-8 text-lg font-semibold">My apps</h2>
       {apps.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-[var(--color-muted)]">
-            还没有应用。上面粘贴一个地址开始体检吧。
+            No apps yet. Paste a URL above to run your first security check.
           </CardContent>
         </Card>
       ) : (
@@ -80,23 +80,23 @@ export default async function Dashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-5 text-sm">
-                      <Stat label="评分" value={last?.score != null ? String(last.score) : "—"} />
+                      <Stat label="Score" value={last?.score != null ? String(last.score) : "—"} />
                       <Stat
-                        label="开放告警"
+                        label="Open alerts"
                         value={String(app.alerts.length)}
                         tone={app.alerts.length > 0 ? "bad" : "good"}
                       />
-                      <Stat label="证据" value={String(app._count.evidenceRecords)} />
+                      <Stat label="Evidence" value={String(app._count.evidenceRecords)} />
                       <div className="hidden text-xs text-[var(--color-muted)] sm:block">
                         {app.monitoringEnabled ? (
                           <span className="inline-flex items-center gap-1 text-[var(--color-accent)]">
-                            <Bell size={13} /> 监测中
+                            <Bell size={13} /> Monitoring
                           </span>
                         ) : (
-                          "未开启监测"
+                          "Monitoring off"
                         )}
                         <div className="mt-1">
-                          {last ? formatDate(last.createdAt) : "未体检"}
+                          {last ? formatDate(last.createdAt) : "Not checked yet"}
                         </div>
                       </div>
                       <ArrowRight size={16} className="text-[var(--color-muted)]" />
@@ -112,17 +112,17 @@ export default async function Dashboard() {
       <Card className="mt-8">
         <CardContent className="p-5">
           <h2 className="mb-1 flex items-center gap-2 text-sm font-medium">
-            <Bell size={14} /> 邮件通知偏好
+            <Bell size={14} /> Email notification preferences
           </h2>
           <p className="mb-4 text-xs text-[var(--color-muted)]">
-            控制告警、周报与体检完成邮件。魔法链接登录邮件始终发送。
+            Control alert, weekly digest, and security check completion emails. Magic link sign-in emails are always sent.
           </p>
           <NotificationSettings />
         </CardContent>
       </Card>
 
       <div className="mt-8 flex items-center gap-2 text-xs text-[var(--color-muted)]">
-        <ShieldCheck size={14} /> 仅提供检测工具，非安全担保方 · 默认只告警不阻断
+        <ShieldCheck size={14} /> A detection tool only, not a security guarantor · Alerts only, never blocks by default
       </div>
     </div>
   );

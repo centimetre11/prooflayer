@@ -49,10 +49,10 @@ export function ReportView({
       {/* header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">安全体检报告</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Security check report</h1>
           <p className="mt-1 break-all text-sm text-[var(--color-muted)]">
             {data.url} · {formatDate(data.createdAt)}
-            {data.rulesetVersion ? ` · 规则集 ${data.rulesetVersion}` : ""}
+            {data.rulesetVersion ? ` · Ruleset ${data.rulesetVersion}` : ""}
           </p>
         </div>
         {actions}
@@ -63,13 +63,13 @@ export function ReportView({
         <HeadlineCard
           icon={<AlertTriangle size={18} />}
           value={String(totalRisks)}
-          label="发现风险总数"
+          label="Total risks found"
           tone={totalRisks === 0 ? "good" : "bad"}
         />
         <HeadlineCard
           icon={<ShieldCheck size={18} />}
-          value={top ? "" : "无"}
-          label="最高危一项"
+          value={top ? "" : "None"}
+          label="Highest-severity finding"
           tone={top ? "bad" : "good"}
           custom={
             top ? (
@@ -83,7 +83,7 @@ export function ReportView({
         <HeadlineCard
           icon={<Clock size={18} />}
           value={estMinutes === 0 ? "0" : `~${estMinutes}`}
-          label="修复预估分钟数"
+          label="Estimated minutes to fix"
           tone={estMinutes === 0 ? "good" : "neutral"}
         />
       </div>
@@ -94,21 +94,21 @@ export function ReportView({
           <div className="flex items-center gap-4">
             <ScoreRing score={score} />
             <div>
-              <div className="text-sm font-medium">安全评分</div>
+              <div className="text-sm font-medium">Security score</div>
               <div className="text-sm text-[var(--color-muted)]">
                 {score >= 80
-                  ? "整体良好，保持监测即可"
+                  ? "Looking good overall — just keep monitoring"
                   : score >= 50
-                    ? "存在需要处理的风险"
-                    : "存在严重风险，建议尽快修复"}
+                    ? "There are risks that need attention"
+                    : "Critical risks present — we recommend fixing them as soon as possible"}
               </div>
             </div>
           </div>
           <div className="text-sm text-[var(--color-muted)]">
             {data.supabaseUrl ? (
-              <>检测到 Supabase：<span className="font-mono text-[var(--color-foreground)]">{data.supabaseUrl}</span></>
+              <>Supabase detected: <span className="font-mono text-[var(--color-foreground)]">{data.supabaseUrl}</span></>
             ) : (
-              "未检测到 Supabase 项目（可能为其他技术栈）"
+              "No Supabase project detected (may be a different tech stack)"
             )}
           </div>
         </CardContent>
@@ -117,12 +117,12 @@ export function ReportView({
       {/* findings */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">
-          风险清单 <span className="text-[var(--color-muted)]">({data.findings.length})</span>
+          Risk list <span className="text-[var(--color-muted)]">({data.findings.length})</span>
         </h2>
         {sorted.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-[var(--color-muted)]">
-              没有发现明显风险。开启每日监测，防止 AI 重写代码导致配置回退。
+              No obvious risks found. Turn on daily monitoring to prevent configuration drift from AI-rewritten code.
             </CardContent>
           </Card>
         ) : (

@@ -18,23 +18,23 @@ export default function AdminCapabilitiesPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-semibold">检测能力清单</h2>
+        <h2 className="text-xl font-semibold">Detection Capabilities</h2>
         <p className="mt-1 text-sm text-[var(--color-muted)]">
-          按安全检测分层记录已落地与规划中的能力，便于产品与运营对齐进度。
+          Tracks shipped and planned capabilities by security detection layer, so product and operations stay aligned on progress.
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryStat label="检测项总数" value={totals.all} />
-        <SummaryStat label="已落地" value={totals.done} tone="done" />
-        <SummaryStat label="部分落地" value={totals.partial} tone="partial" />
-        <SummaryStat label="未做 / 规划" value={totals.planned} tone="planned" />
+        <SummaryStat label="Total checks" value={totals.all} />
+        <SummaryStat label="Shipped" value={totals.done} tone="done" />
+        <SummaryStat label="Partially shipped" value={totals.partial} tone="partial" />
+        <SummaryStat label="Not started / planned" value={totals.planned} tone="planned" />
       </div>
 
       <Card>
         <CardContent className="p-5">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="text-[var(--color-muted)]">整体完成度（部分按 50% 计）</span>
+            <span className="text-[var(--color-muted)]">Overall completion (partial counted as 50%)</span>
             <span className="font-semibold tabular-nums">{donePct}%</span>
           </div>
           <div className="flex h-2 overflow-hidden rounded-full bg-[var(--color-surface-2)]">
@@ -71,15 +71,15 @@ export default function AdminCapabilitiesPage() {
               </div>
               <div className="flex flex-wrap gap-3 text-xs text-[var(--color-muted)]">
                 <span>
-                  已做 <strong className="text-[var(--color-accent)]">{counts.done}</strong>
+                  Shipped <strong className="text-[var(--color-accent)]">{counts.done}</strong>
                 </span>
                 <span>
-                  部分 <strong className="text-[var(--color-medium)]">{counts.partial}</strong>
+                  Partial <strong className="text-[var(--color-medium)]">{counts.partial}</strong>
                 </span>
                 <span>
-                  未做 <strong className="text-[var(--color-foreground)]">{counts.planned}</strong>
+                  Not started <strong className="text-[var(--color-foreground)]">{counts.planned}</strong>
                 </span>
-                <span>共 {counts.all} 项</span>
+                <span>{counts.all} total</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -122,11 +122,11 @@ export default function AdminCapabilitiesPage() {
       </div>
 
       <p className="text-xs text-[var(--color-muted)]">
-        清单定义于{" "}
+        The list is defined in{" "}
         <code className="rounded bg-[var(--color-surface-2)] px-1.5 py-0.5">
           lib/capabilities/catalog.ts
         </code>
-        。新增规则或审计项时请同步更新。
+        . Keep it in sync when adding new rules or audit items.
       </p>
     </div>
   );

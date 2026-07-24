@@ -108,13 +108,13 @@ export async function submitAccessApplication(input: {
     to: email,
     kind: "APPLICATION",
     force: true,
-    subject: "[麋鹿洞察] 已收到你的使用申请",
-    text: `${name}，你好。我们已收到你的使用申请，审核通过后会再发一封邮件通知你登录控制台。`,
+    subject: "[InsightElk] We've received your access request",
+    text: `Hi ${name}. We've received your access request. Once it's approved, we'll send you another email so you can sign in to the console.`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
-        <h2 style="color:#0b1210">申请已提交</h2>
-        <p style="color:#444">${name}，你好。我们已收到你的使用申请。</p>
-        <p style="color:#444">审核通过后会再发一封邮件，届时即可登录控制台。</p>
+        <h2 style="color:#0b1210">Request submitted</h2>
+        <p style="color:#444">Hi ${name}. We've received your access request.</p>
+        <p style="color:#444">Once it's approved, we'll send you another email and you can sign in to the console.</p>
       </div>`,
     meta: { applicationId: application.id, phase: "ack" },
   });
@@ -229,7 +229,7 @@ export async function canLoginWithEmail(email: string) {
     return {
       ok: false as const,
       code: "NOT_REGISTERED" as const,
-      message: "该邮箱尚未开通。请先提交使用申请。",
+      message: "This email is not yet enabled. Please submit an access request first.",
     };
   }
   if (user.role === "ADMIN" || user.status === "ACTIVE") {
@@ -239,19 +239,19 @@ export async function canLoginWithEmail(email: string) {
     return {
       ok: false as const,
       code: "PENDING" as const,
-      message: "你的申请正在审核中，通过后会收到邮件通知。",
+      message: "Your request is under review. You'll get an email once it's approved.",
     };
   }
   if (user.status === "REJECTED") {
     return {
       ok: false as const,
       code: "REJECTED" as const,
-      message: "申请未通过。如需重新申请，请前往申请页提交。",
+      message: "Your request was not approved. If you'd like to reapply, please submit the application form again.",
     };
   }
   return {
     ok: false as const,
     code: "SUSPENDED" as const,
-    message: "账号已停用，请联系管理员。",
+    message: "This account has been suspended. Please contact an administrator.",
   };
 }

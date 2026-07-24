@@ -12,9 +12,9 @@ export function LoginForm() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(
     params.get("error") === "CredentialsSignin"
-      ? "邮箱或密码错误"
+      ? "Incorrect email or password"
       : params.get("error") === "inactive"
-        ? "账号未激活，请联系管理员"
+        ? "Your account is not active. Please contact an administrator."
         : null
   );
 
@@ -32,7 +32,7 @@ export function LoginForm() {
         redirect: false,
       });
       if (res?.error) {
-        setError("邮箱或密码错误，或账号尚未开通");
+        setError("Incorrect email or password, or your account is not yet active");
         return;
       }
       // Route admins straight to the management console, users to the app console.
@@ -56,7 +56,7 @@ export function LoginForm() {
         </p>
       ) : null}
       <div className="space-y-1.5">
-        <label className="text-xs text-[var(--color-muted)]">邮箱</label>
+        <label className="text-xs text-[var(--color-muted)]">Email</label>
         <input
           name="email"
           type="email"
@@ -67,23 +67,23 @@ export function LoginForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs text-[var(--color-muted)]">密码</label>
+        <label className="text-xs text-[var(--color-muted)]">Password</label>
         <input
           name="password"
           type="password"
           required
           autoComplete="current-password"
-          placeholder="至少 8 位"
+          placeholder="At least 8 characters"
           className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
         />
       </div>
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "登录中…" : "登录"}
+        {pending ? "Signing in…" : "Sign in"}
       </Button>
       <p className="text-center text-xs text-[var(--color-muted)]">
-        还没有账号？{" "}
+        Don’t have an account?{" "}
         <Link href="/register" className="text-[var(--color-primary)] hover:underline">
-          注册控制台账号
+          Create a console account
         </Link>
       </p>
     </form>

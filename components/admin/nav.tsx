@@ -21,26 +21,26 @@ type NavItem = {
 
 const GROUPS: { title: string; items: NavItem[] }[] = [
   {
-    title: "运营",
-    items: [{ href: "/admin", label: "概览", icon: LayoutDashboard, exact: true }],
+    title: "Operations",
+    items: [{ href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true }],
   },
   {
-    title: "用户与增长",
+    title: "Users & Growth",
     items: [
-      { href: "/admin/users", label: "用户", icon: Users },
-      { href: "/admin/subscribers", label: "资讯订阅", icon: Newspaper },
+      { href: "/admin/users", label: "Users", icon: Users },
+      { href: "/admin/subscribers", label: "Newsletter", icon: Newspaper },
     ],
   },
   {
-    title: "业务数据",
+    title: "Business Data",
     items: [
-      { href: "/admin/apps", label: "应用", icon: AppWindow },
-      { href: "/admin/capabilities", label: "检测能力", icon: ShieldCheck },
+      { href: "/admin/apps", label: "Applications", icon: AppWindow },
+      { href: "/admin/capabilities", label: "Capabilities", icon: ShieldCheck },
     ],
   },
   {
-    title: "系统",
-    items: [{ href: "/admin/emails", label: "邮件投递", icon: Mail }],
+    title: "System",
+    items: [{ href: "/admin/emails", label: "Email Delivery", icon: Mail }],
   },
 ];
 

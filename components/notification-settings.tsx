@@ -18,7 +18,7 @@ export function NotificationSettings() {
     fetch("/api/settings/notifications")
       .then((r) => r.json())
       .then((d: Pref) => setPref(d))
-      .catch(() => setMsg("加载失败"));
+      .catch(() => setMsg("Failed to load"));
   }, []);
 
   async function save() {
@@ -30,32 +30,32 @@ export function NotificationSettings() {
       body: JSON.stringify(pref),
     });
     if (!res.ok) {
-      setMsg("保存失败");
+      setMsg("Failed to save");
       return;
     }
-    setMsg("已保存");
+    setMsg("Saved");
     startTransition(() => undefined);
   }
 
   if (!pref) {
-    return <p className="text-sm text-[var(--color-muted)]">加载通知偏好…</p>;
+    return <p className="text-sm text-[var(--color-muted)]">Loading notification preferences…</p>;
   }
 
   const rows: { key: keyof Pref; label: string; hint: string }[] = [
     {
       key: "emailAlerts",
-      label: "高危告警邮件",
-      hint: "监测发现 CRITICAL/HIGH 回退时发送",
+      label: "High-severity alert emails",
+      hint: "Sent when monitoring detects a CRITICAL/HIGH regression",
     },
     {
       key: "weeklyDigest",
-      label: "每周安全摘要",
-      hint: "每周一汇总各应用评分与未关闭告警",
+      label: "Weekly security digest",
+      hint: "A Monday summary of each app's score and open alerts",
     },
     {
       key: "scanComplete",
-      label: "体检完成通知",
-      hint: "扫描结束后发送结果摘要（默认关闭）",
+      label: "Security check completion notice",
+      hint: "Sends a results summary after a scan finishes (off by default)",
     },
   ];
 
@@ -85,7 +85,7 @@ export function NotificationSettings() {
       ))}
       <div className="flex items-center gap-3">
         <Button size="sm" onClick={save} disabled={pending}>
-          保存偏好
+          Save preferences
         </Button>
         {msg ? <span className="text-xs text-[var(--color-muted)]">{msg}</span> : null}
       </div>

@@ -125,15 +125,15 @@ function analyze(
           mk(
             "rls-disabled-anon-grant",
             "CRITICAL",
-            `表 ${key} 未启用 RLS 且对 anon 开放`,
-            "该表未启用行级安全（RLS），同时对 anon 角色授予了访问权限。任何人拿 anon 公钥即可直接读写该表数据（CVE-2025-48757 同款根因）。",
+            `Table ${key} has RLS disabled and is granted to anon`,
+            "This table does not have row-level security (RLS) enabled, and it has also granted access to the anon role. Anyone with the anon public key can read and write this table's data directly (the same root cause as CVE-2025-48757).",
             { table: key, rls: false, anonGrant: true },
             {
-              summary: "立即为该表启用 RLS 并编写最小权限策略。",
+              summary: "Immediately enable RLS on this table and write least-privilege policies.",
               steps: [
                 `ALTER TABLE ${key} ENABLE ROW LEVEL SECURITY;`,
-                "为该表创建仅允许必要访问的策略，避免 USING (true)",
-                "确认 anon 角色仅能访问真正需要公开的数据",
+                "Create policies for this table that allow only the necessary access, avoiding USING (true)",
+                "Confirm that the anon role can only access data that genuinely needs to be public",
               ],
               consolePath: "Authentication → Policies",
               estMinutes: 20,
@@ -146,14 +146,14 @@ function analyze(
           mk(
             "rls-disabled",
             "HIGH",
-            `表 ${key} 未启用 RLS`,
-            "该表未启用行级安全（RLS）。若存在任何面向 anon/authenticated 的授权，数据将失去保护。",
+            `Table ${key} does not have RLS enabled`,
+            "This table does not have row-level security (RLS) enabled. If there are any grants to anon/authenticated, the data will be left unprotected.",
             { table: key, rls: false },
             {
-              summary: "为该表启用 RLS 并添加策略。",
+              summary: "Enable RLS on this table and add policies.",
               steps: [
                 `ALTER TABLE ${key} ENABLE ROW LEVEL SECURITY;`,
-                "添加最小权限策略",
+                "Add least-privilege policies",
               ],
               consolePath: "Authentication → Policies",
               estMinutes: 15,
@@ -174,14 +174,14 @@ function analyze(
           mk(
             "rls-policy-using-true",
             "HIGH",
-            `表 ${key} 的策略 ${p.policyname} 使用恒真条件`,
-            "策略包含 USING (true) 或 WITH CHECK (true) 恒真条件，等同于对所有人开放，RLS 形同虚设。",
+            `Policy ${p.policyname} on table ${key} uses an always-true condition`,
+            "The policy contains an always-true USING (true) or WITH CHECK (true) condition, which is equivalent to opening it up to everyone, rendering RLS meaningless.",
             { table: key, policy: p.policyname, cmd: p.cmd, qual: p.qual, with_check: p.with_check },
             {
-              summary: "将恒真条件替换为基于 auth.uid() 等的真实约束。",
+              summary: "Replace the always-true condition with a real constraint based on auth.uid() or similar.",
               steps: [
-                "定位该策略：Authentication → Policies",
-                "把 USING (true) 改为如 USING (auth.uid() = user_id) 的最小权限条件",
+                "Locate the policy: Authentication → Policies",
+                "Change USING (true) to a least-privilege condition such as USING (auth.uid() = user_id)",
               ],
               consolePath: "Authentication → Policies",
               estMinutes: 20,
@@ -197,12 +197,12 @@ function analyze(
         mk(
           "rls-anon-grant-no-policy",
           "CRITICAL",
-          `表 ${key} 对 anon 授权但无任何策略`,
-          "该表启用了 RLS，但对 anon 授予了权限却没有任何策略——取决于配置可能完全放行或完全拒绝，属于危险的不确定状态。",
+          `Table ${key} is granted to anon but has no policies`,
+          "This table has RLS enabled but grants permissions to anon without any policies — depending on the configuration this may allow everything or deny everything, which is a dangerous, indeterminate state.",
           { table: key, anonGrant: true, policies: 0 },
           {
-            summary: "为该表添加明确的最小权限策略。",
-            steps: ["为 anon 可访问的场景编写精确策略", "移除不必要的 anon 授权"],
+            summary: "Add explicit least-privilege policies for this table.",
+            steps: ["Write precise policies for scenarios that anon should access", "Remove unnecessary anon grants"],
             consolePath: "Authentication → Policies",
             estMinutes: 20,
           },
@@ -220,11 +220,11 @@ function analyze(
         mk(
           "func-securitydefiner-searchpath",
           "MEDIUM",
-          `SECURITY DEFINER 函数 ${f.proname} 未固定 search_path`,
-          "SECURITY DEFINER 函数以定义者权限运行，若未固定 search_path，可能被 search_path 注入攻击提权。",
+          `SECURITY DEFINER function ${f.proname} does not have a fixed search_path`,
+          "SECURITY DEFINER functions run with the definer's privileges; without a fixed search_path, they can be escalated via a search_path injection attack.",
           { function: f.proname },
           {
-            summary: "为函数固定 search_path。",
+            summary: "Fix the search_path for the function.",
             steps: [`ALTER FUNCTION ${f.proname} SET search_path = public, pg_temp;`],
             consolePath: "Database → Functions",
             estMinutes: 10,

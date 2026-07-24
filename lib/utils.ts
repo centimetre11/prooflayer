@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate(date: Date | string | number): string {
   const d = new Date(date);
-  return d.toLocaleString("zh-CN", {
+  return d.toLocaleString("en-US", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -20,13 +20,13 @@ export function relativeTime(date: Date | string | number): string {
   const d = new Date(date).getTime();
   const diff = Date.now() - d;
   const sec = Math.floor(diff / 1000);
-  if (sec < 60) return `${sec} 秒前`;
+  if (sec < 60) return `${sec}s ago`;
   const min = Math.floor(sec / 60);
-  if (min < 60) return `${min} 分钟前`;
+  if (min < 60) return `${min}m ago`;
   const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} 小时前`;
+  if (hr < 24) return `${hr}h ago`;
   const day = Math.floor(hr / 24);
-  return `${day} 天前`;
+  return `${day}d ago`;
 }
 
 /** Short, url-safe random id (for share tokens etc.). */

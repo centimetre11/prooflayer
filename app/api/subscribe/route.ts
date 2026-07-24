@@ -19,9 +19,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, already: result.already });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "请输入有效邮箱" }, { status: 400 });
+      return NextResponse.json({ error: "Please enter a valid email" }, { status: 400 });
     }
     console.error("[subscribe]", err);
-    return NextResponse.json({ error: "登记失败" }, { status: 500 });
+    return NextResponse.json({ error: "Subscription failed" }, { status: 500 });
   }
 }

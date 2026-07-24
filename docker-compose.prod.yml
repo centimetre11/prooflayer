@@ -1,4 +1,4 @@
-# Production stack for 麋鹿洞察（InsightElk）.
+# Production stack for InsightElk.
 # Nginx + Certbot live on the host (installed by scripts/deploy.sh --init);
 # this compose file only runs the app, its cron worker, and Postgres.
 # All secrets come from /opt/prooflayer/.env (never committed to Git).

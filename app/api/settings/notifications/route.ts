@@ -28,7 +28,7 @@ export async function PATCH(req: Request) {
   }
   const body = bodySchema.safeParse(await req.json());
   if (!body.success) {
-    return NextResponse.json({ error: "参数无效" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
   }
   await ensureNotificationPreference(session.user.id);
   const pref = await prisma.notificationPreference.update({

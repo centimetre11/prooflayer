@@ -20,7 +20,7 @@ export function SignOutButton({ className }: { className?: string }) {
         "rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-[var(--color-foreground)] hover:border-[var(--color-primary)] disabled:opacity-50"
       }
     >
-      {pending ? "退出中…" : "退出"}
+      {pending ? "Signing out…" : "Sign out"}
     </button>
   );
 }

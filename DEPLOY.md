@@ -1,109 +1,109 @@
-# 部署指南（麋鹿洞察 / InsightElk）
+# Deployment Guide (InsightElk)
 
-本项目按以下约定部署到自有服务器（Ubuntu），Web 应用跑在 Docker 里，
-Nginx + Certbot 装在宿主机上做反向代理与 TLS。
+This project deploys to your own server (Ubuntu) following the conventions below: the web app runs in Docker,
+while Nginx + Certbot are installed on the host to handle reverse proxying and TLS.
 
-## 约定
+## Conventions
 
-| 项目 | 约定 |
+| Item | Convention |
 | --- | --- |
-| 服务器目录 | `/opt/<项目名>`，默认 `/opt/prooflayer` |
-| `.env` | **只放服务器**，首次部署自动生成随机密钥，永不进 Git（`.gitignore` 已忽略 `.env*`） |
-| 上线方式 | 推到 `main` **不会**自动上线，必须本机跑 `scripts/deploy.sh` |
-| 反向代理 | 宿主机 Nginx → `127.0.0.1:3000`（容器只监听回环） |
-| TLS | Certbot（Let's Encrypt），需域名已解析到服务器 IP |
+| Server directory | `/opt/<app-name>`, default `/opt/prooflayer` |
+| `.env` | **Server-only**, random secrets auto-generated on first deploy, never committed to Git (`.gitignore` already ignores `.env*`) |
+| Release method | Pushing to `main` does **not** auto-deploy; you must run `scripts/deploy.sh` locally |
+| Reverse proxy | Host Nginx → `127.0.0.1:3000` (the container only listens on loopback) |
+| TLS | Certbot (Let's Encrypt); the domain must already resolve to the server IP |
 
-## 前提
+## Prerequisites
 
-- 本机能免密 SSH 到服务器（例如 `ssh ubuntu@43.164.65.54`）。
-- 若要 HTTPS：域名的 A 记录已指向服务器 IP。
+- Your local machine can SSH to the server without a password (e.g. `ssh ubuntu@43.164.65.54`).
+- For HTTPS: the domain's A record already points to the server IP.
 
-## 首次装机（安装 Docker / Nginx / Certbot 并部署）
+## First-Time Provisioning (installs Docker / Nginx / Certbot and deploys)
 
 ```bash
 ./scripts/deploy.sh ubuntu@43.164.65.54 --domain example.com --init
 ```
 
-`--init` 只需第一次执行。之后再部署不用带 `--init`。
+`--init` is only needed the first time. Later deploys don't need `--init`.
 
-## 日常部署
+## Routine Deployment
 
 ```bash
-# Git 策略（默认，正式仓库）：服务器 git pull 后重建容器
+# Git strategy (default, official repo): the server runs git pull, then rebuilds the containers
 ./scripts/deploy.sh ubuntu@43.164.65.54 --domain example.com
 
-# 仅先跑起来、暂无域名（HTTP，用 IP 访问）
+# Just get it running for now, no domain yet (HTTP, accessed via IP)
 ./scripts/deploy.sh ubuntu@43.164.65.54
 ```
 
-## 两种同步策略
+## Two Sync Strategies
 
-### 1. Git 部署（默认，`--strategy git`）
+### 1. Git deploy (default, `--strategy git`)
 
-代码在 GitHub，服务器是 clone 副本。适合正式仓库。
-部署时服务器执行 `git fetch && git reset --hard origin/<branch>`。
+The code lives on GitHub, and the server holds a clone. Good for the official repo.
+On deploy, the server runs `git fetch && git reset --hard origin/<branch>`.
 
-- **公开仓库**：无需额外配置，服务器直接 HTTPS clone。
-- **私有仓库**：需要在服务器配 **Deploy Key**，服务器才能 `git pull`：
+- **Public repo**: no extra configuration needed; the server clones directly over HTTPS.
+- **Private repo**: you need to configure a **Deploy Key** on the server so it can `git pull`:
 
   ```bash
-  # 1) 在服务器生成一把只读 Deploy Key
+  # 1) Generate a read-only Deploy Key on the server
   ssh ubuntu@43.164.65.54 'ssh-keygen -t ed25519 -N "" -f ~/.ssh/prooflayer_deploy -C prooflayer-deploy'
   ssh ubuntu@43.164.65.54 'cat ~/.ssh/prooflayer_deploy.pub'
 
-  # 2) 把公钥加为仓库 Deploy Key（Settings → Deploy keys，read-only 即可）
+  # 2) Add the public key as a repo Deploy Key (Settings → Deploy keys, read-only is fine)
   gh repo deploy-key add <(ssh ubuntu@43.164.65.54 'cat ~/.ssh/prooflayer_deploy.pub') \
     -R centimetre11/prooflayer -t prooflayer-deploy
 
-  # 3) 让该 key 用于 github.com（服务器 ~/.ssh/config）
+  # 3) Make that key be used for github.com (server ~/.ssh/config)
   #    Host github.com
   #      IdentityFile ~/.ssh/prooflayer_deploy
   #      IdentitiesOnly yes
 
-  # 4) 部署时用 SSH 形式的仓库地址
+  # 4) Use the SSH-form repo URL when deploying
   ./scripts/deploy.sh ubuntu@43.164.65.54 --repo git@github.com:centimetre11/prooflayer.git
   ```
 
-### 2. rsync 部署（`--strategy rsync`）
+### 2. rsync deploy (`--strategy rsync`)
 
-本机工作区直接同步到服务器，不经过 GitHub。适合还不想走 Git 发布的项目。
+The local working tree syncs directly to the server, bypassing GitHub. Good for projects you don't want to publish via Git yet.
 
 ```bash
 ./scripts/deploy.sh ubuntu@43.164.65.54 --strategy rsync
 ```
 
-会排除 `.git / node_modules / .next / .env`。
+It excludes `.git / node_modules / .next / .env`.
 
-## 环境变量（.env）
+## Environment Variables (.env)
 
-首次部署时 `deploy.sh` 会在服务器生成 `/opt/prooflayer/.env`，包含随机的
-`POSTGRES_PASSWORD / AUTH_SECRET / CREDENTIAL_MASTER_KEY / CRON_SECRET`，
-`DATABASE_URL` 指向 compose 内的 `db` 服务。字段说明见 `.env.example`。
+On first deploy, `deploy.sh` generates `/opt/prooflayer/.env` on the server, containing random
+`POSTGRES_PASSWORD / AUTH_SECRET / CREDENTIAL_MASTER_KEY / CRON_SECRET`,
+with `DATABASE_URL` pointing at the `db` service inside compose. See `.env.example` for field descriptions.
 
-需要真实发信（魔法链接登录、告警邮件）时，登录服务器补上 `RESEND_API_KEY` 后重启：
+When you need real email sending (magic-link sign-in, alert emails), log in to the server, add `RESEND_API_KEY`, and restart:
 
 ```bash
 ssh ubuntu@43.164.65.54
-cd /opt/prooflayer && nano .env         # 填入 RESEND_API_KEY
+cd /opt/prooflayer && nano .env         # fill in RESEND_API_KEY
 sudo docker compose -f docker-compose.prod.yml up -d
 ```
 
-## 服务构成（docker-compose.prod.yml）
+## Service Makeup (docker-compose.prod.yml)
 
-- `db`：Postgres 16，数据存于命名卷 `prooflayer_pgdata`。
-- `app`：Next.js 应用（含 Playwright/Chromium 做真实扫描）。启动时自动
-  `prisma db push` 建表并 seed 规则，然后 `next start`，仅监听 `127.0.0.1:3000`。
-- `worker`：常驻 cron 进程，每日 03:00 做漂移检测 / secret 监测 / 邮件告警。
+- `db`: Postgres 16, data stored in the named volume `prooflayer_pgdata`.
+- `app`: the Next.js app (includes Playwright/Chromium for real scanning). On startup it automatically
+  runs `prisma db push` to create tables and seeds the rules, then `next start`, listening only on `127.0.0.1:3000`.
+- `worker`: a resident cron process that runs drift detection / secret monitoring / email alerts daily at 03:00.
 
-## 常用运维命令
+## Common Ops Commands
 
 ```bash
-# 看日志
+# View logs
 ssh ubuntu@43.164.65.54 'cd /opt/prooflayer && sudo docker compose -f docker-compose.prod.yml logs -f app'
 
-# 重启
+# Restart
 ssh ubuntu@43.164.65.54 'cd /opt/prooflayer && sudo docker compose -f docker-compose.prod.yml restart'
 
-# 手动跑一次监测
+# Run monitoring once manually
 ssh ubuntu@43.164.65.54 'cd /opt/prooflayer && sudo docker compose -f docker-compose.prod.yml exec worker npx tsx worker/monitor.ts --once'
 ```

@@ -54,14 +54,14 @@ export function ReportActions({
     <div className="flex flex-col items-stretch gap-2 sm:items-end">
       <div className="flex flex-wrap gap-2">
         <Button variant="secondary" size="sm" onClick={retest} disabled={retesting}>
-          <RefreshCw size={15} className={retesting ? "animate-spin" : ""} /> 复测对比
+          <RefreshCw size={15} className={retesting ? "animate-spin" : ""} /> Retest & compare
         </Button>
         <Button variant="secondary" size="sm" onClick={share}>
-          <Share2 size={15} /> 生成分享链接
+          <Share2 size={15} /> Create share link
         </Button>
         <Button asChild size="sm">
           <Link href={`/audit?url=${encodeURIComponent(url)}&from=${scanId}`}>
-            <DatabaseZap size={15} /> 深度 RLS 审计
+            <DatabaseZap size={15} /> Deep RLS audit
           </Link>
         </Button>
       </div>

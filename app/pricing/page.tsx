@@ -8,12 +8,12 @@ export default function PricingPage() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-14">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">按受保护应用数定价</h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Pricing by number of protected apps</h1>
         <p className="mt-3 text-[var(--color-muted)]">
-          免费体检获客，治理订阅为收入主体。付费动机是把既有证据变现——查看免费，导出/分享付费。
+          Free security checks drive acquisition; governance subscriptions are the core of revenue. The reason to pay is to monetize the evidence you already have—viewing is free, exporting/sharing is paid.
         </p>
         <p className="mt-2 text-sm text-[var(--color-primary)]">
-          {PROMO_LABEL}：付费档标原价，限时成交价 $0
+          {PROMO_LABEL}: paid tiers show the original price, with a limited-time deal price of $0
         </p>
       </div>
 
@@ -28,7 +28,7 @@ export default function PricingPage() {
               <CardContent className="flex h-full flex-col p-6">
                 {p.highlight && (
                   <span className="mb-2 inline-flex w-fit items-center gap-1 rounded-full bg-[var(--color-primary)] px-2.5 py-0.5 text-xs font-semibold text-[var(--color-primary-fg)]">
-                    <Zap size={12} /> 最受欢迎
+                    <Zap size={12} /> Most popular
                   </span>
                 )}
                 <h3 className="text-lg font-semibold">{p.name}</h3>
@@ -68,12 +68,12 @@ export default function PricingPage() {
                 >
                   <Link href={p.tier === "ENTERPRISE" ? "/#subscribe" : "/register"}>
                     {p.tier === "FREE"
-                      ? "免费注册"
+                      ? "Sign up free"
                       : p.tier === "ENTERPRISE"
-                        ? "登记邮箱咨询"
+                        ? "Contact us by email"
                         : onPromo
-                          ? "限时免费注册"
-                          : "注册开通"}
+                          ? "Sign up free (limited time)"
+                          : "Sign up"}
                   </Link>
                 </Button>
               </CardContent>
@@ -83,7 +83,7 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-8 text-center text-xs text-[var(--color-muted)]">
-        本页为方案展示，尚未接入支付网关。麋鹿洞察仅提供检测工具，非安全担保方。
+        This page is for plan display only; no payment gateway is connected yet. InsightElk provides detection tools only and is not a security guarantor.
       </p>
     </div>
   );

@@ -29,7 +29,7 @@ export function FindingCard({ finding }: { finding: FindingView }) {
           <div className="flex items-center gap-2">
             <SeverityBadge severity={finding.severity} />
             <span className="text-xs text-[var(--color-muted)]">
-              {finding.category} · 置信度 {finding.confidence}%
+              {finding.category} · Confidence {finding.confidence}%
             </span>
           </div>
           <h3 className="mt-2 text-base font-semibold">{finding.title}</h3>
@@ -39,7 +39,7 @@ export function FindingCard({ finding }: { finding: FindingView }) {
 
       {Object.keys(ev).length > 0 && (
         <div className="mx-5 mb-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] p-3">
-          <div className="mb-1 text-xs font-medium text-[var(--color-muted)]">证据（已脱敏）</div>
+          <div className="mb-1 text-xs font-medium text-[var(--color-muted)]">Evidence (redacted)</div>
           <dl className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-2">
             {Object.entries(ev).map(([k, v]) => (
               <div key={k} className="flex gap-2">
@@ -57,7 +57,7 @@ export function FindingCard({ finding }: { finding: FindingView }) {
         <div className="border-t border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface-2)_60%,transparent)] p-5">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Wrench size={16} className="text-[var(--color-accent)]" />
-            如何修复
+            How to fix
           </div>
           {rem.summary && <p className="mt-2 text-sm">{rem.summary}</p>}
           {rem.steps && rem.steps.length > 0 && (
@@ -75,7 +75,7 @@ export function FindingCard({ finding }: { finding: FindingView }) {
             )}
             {typeof rem.estMinutes === "number" && rem.estMinutes > 0 && (
               <span className="inline-flex items-center gap-1">
-                <Clock size={13} /> 约 {rem.estMinutes} 分钟
+                <Clock size={13} /> ~{rem.estMinutes} min
               </span>
             )}
           </div>

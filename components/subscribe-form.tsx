@@ -31,13 +31,13 @@ export function SubscribeForm({
         already?: boolean;
       };
       if (!res.ok) {
-        setError(data.error ?? "登记失败");
+        setError(data.error ?? "Sign-up failed");
         return;
       }
       setMsg(
         data.already
-          ? "这个邮箱已登记过，我们会继续给你发送更新。"
-          : "登记成功。我们会把产品更新发到你的邮箱（不会开通控制台）。"
+          ? "This email is already signed up—we'll keep sending you updates."
+          : "You're signed up. We'll send product updates to your email (no console account created)."
       );
       e.currentTarget.reset();
     });
@@ -56,11 +56,11 @@ export function SubscribeForm({
         name="email"
         type="email"
         required
-        placeholder="你的邮箱"
+        placeholder="Your email"
         className="h-10 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
       />
       <Button type="submit" disabled={pending} className={compact ? "shrink-0" : "w-full"}>
-        {pending ? "提交中…" : "登记收资讯"}
+        {pending ? "Submitting…" : "Sign up for updates"}
       </Button>
       {error ? (
         <p className="text-xs text-[var(--color-critical)] sm:col-span-2">{error}</p>

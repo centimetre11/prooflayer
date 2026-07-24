@@ -27,9 +27,9 @@ export default async function AdminApplicationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">用户申请</h2>
+        <h2 className="text-xl font-semibold">Access Requests</h2>
         <p className="text-sm text-[var(--color-muted)]">
-          审核通过后会邮件通知申请人，对方即可登录控制台（待审 {pending}）
+          Once approved, the applicant is notified by email and can sign in to the console (Pending {pending})
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export default async function AdminApplicationsPage() {
         {apps.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-sm text-[var(--color-muted)]">
-              还没有申请。申请人可访问 /apply 提交。
+              No requests yet. Applicants can submit one at /apply.
             </CardContent>
           </Card>
         ) : (
@@ -52,8 +52,8 @@ export default async function AdminApplicationsPage() {
                   <p className="text-sm text-[var(--color-muted)]">{a.email}</p>
                   <p className="text-xs text-[var(--color-muted)]">
                     {a.company ? `${a.company} · ` : ""}
-                    提交于 {formatDate(a.createdAt)}
-                    {a.reviewedAt ? ` · 审核于 ${formatDate(a.reviewedAt)}` : ""}
+                    Submitted {formatDate(a.createdAt)}
+                    {a.reviewedAt ? ` · Reviewed ${formatDate(a.reviewedAt)}` : ""}
                   </p>
                   {a.note ? (
                     <p className="text-sm text-[var(--color-foreground)]">{a.note}</p>

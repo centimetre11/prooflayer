@@ -13,9 +13,9 @@ export default async function AdminSubscribersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">资讯订阅</h2>
+        <h2 className="text-xl font-semibold">Newsletter Subscribers</h2>
         <p className="text-sm text-[var(--color-muted)]">
-          仅登记邮箱收资讯的访客（非控制台账号）· 有效 {active} / 共 {subs.length}
+          Visitors who only signed up with an email for the newsletter (not console accounts) · Active {active} / {subs.length} total
         </p>
       </div>
 
@@ -23,7 +23,7 @@ export default async function AdminSubscribersPage() {
         {subs.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-sm text-[var(--color-muted)]">
-              还没有订阅。访客可在首页底部「登记邮箱」提交。
+              No subscribers yet. Visitors can sign up via the email registration form at the bottom of the homepage.
             </CardContent>
           </Card>
         ) : (
@@ -33,7 +33,7 @@ export default async function AdminSubscribersPage() {
                 <div>
                   <div className="font-medium">{s.email}</div>
                   <div className="text-xs text-[var(--color-muted)]">
-                    来源 {s.source ?? "—"} · {formatDate(s.createdAt)}
+                    Source {s.source ?? "—"} · {formatDate(s.createdAt)}
                   </div>
                 </div>
                 <Badge
@@ -43,7 +43,7 @@ export default async function AdminSubscribersPage() {
                       : "text-[var(--color-accent)]"
                   }
                 >
-                  {s.unsubscribed ? "已退订" : "订阅中"}
+                  {s.unsubscribed ? "Unsubscribed" : "Subscribed"}
                 </Badge>
               </CardContent>
             </Card>

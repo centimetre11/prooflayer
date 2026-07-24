@@ -32,8 +32,8 @@ export async function sendEmail(input: EmailInput): Promise<SendEmailResult> {
   const from =
     process.env.EMAIL_FROM ??
     (process.env.SMTP_USER
-      ? `麋鹿洞察 <${process.env.SMTP_USER}>`
-      : "麋鹿洞察 <onboarding@resend.dev>");
+      ? `InsightElk <${process.env.SMTP_USER}>`
+      : "InsightElk <onboarding@resend.dev>");
 
   const delivery = await prisma.emailDelivery.create({
     data: {

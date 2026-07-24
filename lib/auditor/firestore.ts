@@ -44,12 +44,12 @@ export function runFirestoreAudit(rules: string): AuditResult {
       mk(
         "fs-rules-version",
         "INFO",
-        "未声明 rules_version = '2'",
-        "未显式声明规则版本，建议使用 v2 语法以获得递归通配符等能力。",
+        "rules_version = '2' not declared",
+        "The rules version is not explicitly declared. We recommend using v2 syntax to gain capabilities such as recursive wildcards.",
         {},
         {
-          summary: "在规则文件首行声明 rules_version = '2';",
-          steps: ["在 firestore.rules 顶部加上 rules_version = '2';"],
+          summary: "Declare rules_version = '2'; on the first line of the rules file.",
+          steps: ["Add rules_version = '2'; at the top of firestore.rules"],
           consolePath: "Firestore → Rules",
           estMinutes: 2,
         },
@@ -78,16 +78,16 @@ export function runFirestoreAudit(rules: string): AuditResult {
           "fs-allow-true",
           hasWrite ? "CRITICAL" : "HIGH",
           hasWrite
-            ? `规则对所有人开放读写（allow ${ops}: if true）`
-            : `规则对所有人开放读取（allow ${ops}: if true）`,
-          "该 allow 条件恒真，任何人（含未登录用户）都能直接访问，等同于数据库完全裸奔。",
+            ? `Rule grants read/write to everyone (allow ${ops}: if true)`
+            : `Rule grants read access to everyone (allow ${ops}: if true)`,
+          "This allow condition is always true, so anyone (including unauthenticated users) can access the data directly — the database is completely exposed.",
           { rule: snippet, line },
           {
-            summary: "移除 if true，改为基于 request.auth 与数据归属的最小权限条件。",
+            summary: "Remove if true and replace it with a least-privilege condition based on request.auth and data ownership.",
             steps: [
-              "定位 Firestore → Rules 中该 match 块",
-              "把 if true 改为如 if request.auth != null && request.auth.uid == resource.data.ownerId",
-              "对公开可读的集合也应显式限定字段与操作，而非整体放开",
+              "Locate this match block under Firestore → Rules",
+              "Change if true to something like if request.auth != null && request.auth.uid == resource.data.ownerId",
+              "Even for publicly readable collections, explicitly restrict fields and operations rather than opening everything up",
             ],
             consolePath: "Firestore → Rules",
             estMinutes: 20,
@@ -100,14 +100,14 @@ export function runFirestoreAudit(rules: string): AuditResult {
         mk(
           "fs-test-mode",
           "HIGH",
-          `疑似测试模式规则（基于时间的临时放开：allow ${ops}）`,
-          "规则用 request.time < timestamp 做时间限制，是 Firebase「测试模式」默认写法——到期前对所有人开放，极易忘记收紧。",
+          `Likely test-mode rule (time-based temporary access: allow ${ops})`,
+          "The rule uses request.time < timestamp as a time limit, which is Firebase's default \"test mode\" pattern — it's open to everyone until it expires, and it's very easy to forget to tighten it.",
           { rule: snippet, line },
           {
-            summary: "去掉时间限制，改为正式的身份/归属校验。",
+            summary: "Remove the time limit and replace it with proper identity/ownership checks.",
             steps: [
-              "移除 request.time < timestamp.date(...) 这类条件",
-              "改为 request.auth != null 及数据归属校验",
+              "Remove conditions like request.time < timestamp.date(...)",
+              "Replace them with request.auth != null and data-ownership checks",
             ],
             consolePath: "Firestore → Rules",
             estMinutes: 15,
@@ -120,14 +120,14 @@ export function runFirestoreAudit(rules: string): AuditResult {
         mk(
           "fs-write-no-auth",
           "HIGH",
-          `写操作未校验登录（allow ${ops} 缺少 request.auth）`,
-          "该写规则的条件里没有对 request.auth 做校验，未登录用户可能即可写入。",
+          `Write operation without login check (allow ${ops} missing request.auth)`,
+          "This write rule's condition does not check request.auth, so unauthenticated users may be able to write.",
           { rule: snippet, line },
           {
-            summary: "写操作至少要求 request.auth != null，并校验数据归属。",
+            summary: "Write operations should at least require request.auth != null and verify data ownership.",
             steps: [
-              "在条件中加入 request.auth != null",
-              "进一步校验 request.auth.uid 与被写文档的归属字段一致",
+              "Add request.auth != null to the condition",
+              "Further verify that request.auth.uid matches the ownership field of the document being written",
             ],
             consolePath: "Firestore → Rules",
             estMinutes: 15,
@@ -143,12 +143,12 @@ export function runFirestoreAudit(rules: string): AuditResult {
       mk(
         "fs-no-allow",
         "INFO",
-        "未解析到 allow 规则",
-        "未在提供的内容里解析到任何 allow 语句。请确认粘贴的是完整的 firestore.rules 内容。",
+        "No allow rules parsed",
+        "No allow statements were parsed from the provided content. Please confirm that you pasted the complete firestore.rules content.",
         {},
         {
-          summary: "提供完整的 firestore.rules 文件内容。",
-          steps: ["让 AI 助手输出 firestore.rules 的完整原文再试"],
+          summary: "Provide the complete contents of the firestore.rules file.",
+          steps: ["Have your AI assistant output the full, verbatim firestore.rules and try again"],
           estMinutes: 2,
         },
         "noallow"

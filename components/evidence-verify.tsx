@@ -24,7 +24,7 @@ export function EvidenceVerify({ appId }: { appId: string }) {
     <div className="flex flex-wrap items-center gap-3">
       <Button variant="secondary" size="sm" onClick={verify} disabled={loading}>
         {loading ? <Loader2 size={15} className="animate-spin" /> : <ShieldCheck size={15} />}
-        校验证据链完整性
+        Verify evidence chain integrity
       </Button>
       {result && (
         <span
@@ -34,8 +34,8 @@ export function EvidenceVerify({ appId }: { appId: string }) {
         >
           {result.ok ? <ShieldCheck size={15} /> : <ShieldAlert size={15} />}
           {result.ok
-            ? `完整：${result.length} 条记录，哈希链未被篡改`
-            : `发现异常：第 ${result.brokenAt} 条记录不匹配`}
+            ? `Intact: ${result.length} records, hash chain untampered`
+            : `Anomaly found: record #${result.brokenAt} does not match`}
         </span>
       )}
     </div>

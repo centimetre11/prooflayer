@@ -1,14 +1,14 @@
 {
   "version": "supabase-v1.0.0",
-  "name": "Supabase 生态外部体检规则集",
+  "name": "Supabase Ecosystem External Health-Check Ruleset",
   "rules": [
     {
       "id": "supabase-url-exposed",
       "category": "exposure",
       "severity": "INFO",
       "matcherType": "regex",
-      "title": "检测到 Supabase 项目地址",
-      "description": "在前端资源中发现了你的 Supabase 项目地址。这本身正常（前端必然会带），我们据此对你的数据库门锁做进一步检查。",
+      "title": "Supabase project URL detected",
+      "description": "Your Supabase project URL was found in frontend assets. This is normal in itself (the frontend must include it); we use it to run further checks on your database's front door.",
       "confidence": 95,
       "payload": {
         "pattern": "https?://([a-z0-9]{16,30})\\.supabase\\.co",
@@ -17,8 +17,8 @@
         "max": 1
       },
       "remediation": {
-        "summary": "无需处理——这是我们定位你项目的依据。",
-        "steps": ["无需操作"],
+        "summary": "No action needed — this is what we use to locate your project.",
+        "steps": ["No action required"],
         "consolePath": "",
         "estMinutes": 0
       }
@@ -28,17 +28,17 @@
       "category": "secret-exposure",
       "severity": "CRITICAL",
       "matcherType": "jwt_decode",
-      "title": "service_role 密钥泄露到前端",
-      "description": "在浏览器可见的代码/请求中发现了 Supabase 的 service_role 密钥。该密钥绕过所有 RLS，等同于数据库超级管理员权限，任何人都能读写你的全部数据。这是最严重的一类事故（CVE-2025-48757 同款根因）。",
+      "title": "service_role key leaked to the frontend",
+      "description": "A Supabase service_role key was found in browser-visible code/requests. This key bypasses all RLS and is equivalent to database superadmin privileges — anyone can read and write all of your data. This is the most severe class of incident (the same root cause as CVE-2025-48757).",
       "confidence": 99,
       "payload": { "requireRole": "service_role", "requireIss": "supabase" },
       "remediation": {
-        "summary": "立即轮换 service_role 密钥，并确保它永远不出现在前端。",
+        "summary": "Rotate the service_role key immediately and make sure it never appears in the frontend.",
         "steps": [
-          "登录 Supabase 控制台，进入 Project Settings → API",
-          "点击 service_role 密钥旁的 Reset/Roll 轮换密钥",
-          "从前端代码中删除该密钥，只在服务端（Edge Function/后端）使用",
-          "检查 Git 历史，若曾提交需一并清除并轮换"
+          "Sign in to the Supabase console and go to Project Settings → API",
+          "Click Reset/Roll next to the service_role key to rotate it",
+          "Remove the key from your frontend code and use it only server-side (Edge Function/backend)",
+          "Check your Git history; if it was ever committed, purge it and rotate as well"
         ],
         "consolePath": "Project Settings → API → Project API keys",
         "estMinutes": 30
@@ -49,8 +49,8 @@
       "category": "secret-exposure",
       "severity": "CRITICAL",
       "matcherType": "regex",
-      "title": "Supabase Secret Key（sb_secret_）泄露",
-      "description": "发现新版 Supabase secret key（sb_secret_ 前缀）出现在前端资源中。该密钥拥有服务端级别权限，绝不能暴露在浏览器可见的位置。",
+      "title": "Supabase Secret Key (sb_secret_) leaked",
+      "description": "A new-style Supabase secret key (sb_secret_ prefix) was found in frontend assets. This key has server-level privileges and must never be exposed anywhere the browser can see it.",
       "confidence": 98,
       "payload": {
         "pattern": "sb_secret_[A-Za-z0-9_\\-]{16,}",
@@ -58,11 +58,11 @@
         "max": 2
       },
       "remediation": {
-        "summary": "在控制台轮换该 secret key 并从前端移除。",
+        "summary": "Rotate the secret key in the console and remove it from the frontend.",
         "steps": [
-          "Supabase 控制台 → Project Settings → API Keys",
-          "轮换（Roll）泄露的 secret key",
-          "仅在服务端环境变量中使用新 key"
+          "Supabase console → Project Settings → API Keys",
+          "Roll the leaked secret key",
+          "Use the new key only in server-side environment variables"
         ],
         "consolePath": "Project Settings → API Keys",
         "estMinutes": 30
@@ -73,16 +73,16 @@
       "category": "secret-exposure",
       "severity": "LOW",
       "matcherType": "jwt_decode",
-      "title": "anon 公钥已暴露（需确认 RLS 已开启）",
-      "description": "发现 Supabase anon 公钥。anon key 本就设计为公开可见，风险不在于泄露本身，而在于——如果对应的表没有开启 RLS，任何人拿这把 key 就能直接读写你的数据。请务必确认所有含用户数据的表都启用了 RLS。",
+      "title": "anon public key exposed (confirm RLS is enabled)",
+      "description": "A Supabase anon public key was found. The anon key is designed to be publicly visible, so the risk is not the exposure itself but this: if the corresponding tables don't have RLS enabled, anyone with this key can read and write your data directly. Be sure to confirm that RLS is enabled on all tables that hold user data.",
       "confidence": 90,
       "payload": { "requireRole": "anon", "requireIss": "supabase" },
       "remediation": {
-        "summary": "确认所有业务表已启用 RLS，并连接 Supabase 做深度审计。",
+        "summary": "Confirm RLS is enabled on all business tables and connect Supabase for a deep audit.",
         "steps": [
-          "Supabase 控制台 → Authentication → Policies 逐表确认 RLS 已启用",
-          "对含用户数据的表编写最小权限策略，避免 USING (true)",
-          "在麋鹿洞察里连接只读凭证做一次深度 RLS 审计"
+          "Supabase console → Authentication → Policies: confirm RLS is enabled table by table",
+          "Write least-privilege policies for tables holding user data, avoiding USING (true)",
+          "Connect a read-only credential in InsightElk to run a deep RLS audit"
         ],
         "consolePath": "Authentication → Policies",
         "estMinutes": 20
@@ -93,8 +93,8 @@
       "category": "exposure",
       "severity": "INFO",
       "matcherType": "regex",
-      "title": "Supabase Publishable Key（sb_publishable_）",
-      "description": "发现新版 publishable key（sb_publishable_ 前缀）。它设计为可公开，等价于 anon key，风险取决于 RLS 是否正确配置。",
+      "title": "Supabase Publishable Key (sb_publishable_)",
+      "description": "A new-style publishable key (sb_publishable_ prefix) was found. It is designed to be public and is equivalent to the anon key; the risk depends on whether RLS is configured correctly.",
       "confidence": 90,
       "payload": {
         "pattern": "sb_publishable_[A-Za-z0-9_\\-]{16,}",
@@ -102,8 +102,8 @@
         "max": 1
       },
       "remediation": {
-        "summary": "确认 RLS 已正确配置即可。",
-        "steps": ["确认业务表已开启 RLS 并配置最小权限策略"],
+        "summary": "Just confirm that RLS is configured correctly.",
+        "steps": ["Confirm that business tables have RLS enabled with least-privilege policies configured"],
         "consolePath": "Authentication → Policies",
         "estMinutes": 15
       }
@@ -113,8 +113,8 @@
       "category": "secret-exposure",
       "severity": "CRITICAL",
       "matcherType": "regex",
-      "title": "Stripe 生产 Secret Key 泄露",
-      "description": "发现 Stripe 生产环境 secret key（sk_live_）。攻击者可用它发起真实收退款、读取客户与支付数据。",
+      "title": "Stripe live Secret Key leaked",
+      "description": "A Stripe live secret key (sk_live_) was found. An attacker could use it to issue real charges and refunds and to read customer and payment data.",
       "confidence": 98,
       "payload": {
         "pattern": "sk_live_[0-9A-Za-z]{20,}",
@@ -122,11 +122,11 @@
         "max": 2
       },
       "remediation": {
-        "summary": "立即在 Stripe Dashboard 轮换（roll）该密钥。",
+        "summary": "Roll the key immediately in the Stripe Dashboard.",
         "steps": [
-          "登录 Stripe Dashboard → Developers → API keys",
-          "Roll 泄露的 secret key",
-          "secret key 只能存在于服务端，前端仅可使用 publishable key"
+          "Sign in to the Stripe Dashboard → Developers → API keys",
+          "Roll the leaked secret key",
+          "Secret keys must live only server-side; the frontend may use only the publishable key"
         ],
         "consolePath": "Stripe Dashboard → Developers → API keys",
         "estMinutes": 25
@@ -137,8 +137,8 @@
       "category": "secret-exposure",
       "severity": "HIGH",
       "matcherType": "regex",
-      "title": "OpenAI API Key 泄露",
-      "description": "发现疑似 OpenAI API key。泄露会被盗刷产生高额账单。AI 应用常把 key 直接写进前端调用模型，是高频坑。",
+      "title": "OpenAI API Key leaked",
+      "description": "A likely OpenAI API key was found. A leak can be abused to run up large bills. AI apps often hardcode the key into frontend model calls, which is a common pitfall.",
       "confidence": 85,
       "payload": {
         "pattern": "sk-(?:proj-)?[A-Za-z0-9_\\-]{20,}",
@@ -146,11 +146,11 @@
         "max": 2
       },
       "remediation": {
-        "summary": "撤销该 key，改由服务端代理调用模型。",
+        "summary": "Revoke the key and proxy model calls through your server instead.",
         "steps": [
-          "OpenAI 平台 → API keys → Revoke 泄露的 key",
-          "新建 key 只放服务端，前端通过你自己的后端代理调用",
-          "设置用量上限与告警"
+          "OpenAI platform → API keys → Revoke the leaked key",
+          "Create a new key that stays server-side; have the frontend call through your own backend proxy",
+          "Set usage limits and alerts"
         ],
         "consolePath": "platform.openai.com → API keys",
         "estMinutes": 30
@@ -161,8 +161,8 @@
       "category": "secret-exposure",
       "severity": "HIGH",
       "matcherType": "regex",
-      "title": "Anthropic API Key 泄露",
-      "description": "发现疑似 Anthropic（Claude）API key（sk-ant- 前缀），泄露会被盗刷。",
+      "title": "Anthropic API Key leaked",
+      "description": "A likely Anthropic (Claude) API key (sk-ant- prefix) was found; a leak can be abused to run up charges.",
       "confidence": 90,
       "payload": {
         "pattern": "sk-ant-[A-Za-z0-9_\\-]{20,}",
@@ -170,10 +170,10 @@
         "max": 2
       },
       "remediation": {
-        "summary": "在 Anthropic 控制台撤销并改为服务端代理。",
+        "summary": "Revoke it in the Anthropic console and switch to a server-side proxy.",
         "steps": [
-          "console.anthropic.com → API Keys → 撤销泄露 key",
-          "改由服务端保存与调用"
+          "console.anthropic.com → API Keys → revoke the leaked key",
+          "Store and call it server-side instead"
         ],
         "consolePath": "console.anthropic.com → API Keys",
         "estMinutes": 30
@@ -184,8 +184,8 @@
       "category": "secret-exposure",
       "severity": "HIGH",
       "matcherType": "regex",
-      "title": "AWS Access Key 泄露",
-      "description": "发现 AWS Access Key ID（AKIA 前缀）。若配套 secret 也泄露，攻击者可操作你的云资源。",
+      "title": "AWS Access Key leaked",
+      "description": "An AWS Access Key ID (AKIA prefix) was found. If the matching secret is also leaked, an attacker could operate your cloud resources.",
       "confidence": 88,
       "payload": {
         "pattern": "AKIA[0-9A-Z]{16}",
@@ -193,11 +193,11 @@
         "max": 2
       },
       "remediation": {
-        "summary": "在 IAM 中禁用/删除该访问密钥并排查使用。",
+        "summary": "Deactivate/delete the access key in IAM and investigate its use.",
         "steps": [
-          "AWS 控制台 → IAM → Users → Security credentials",
-          "Deactivate/Delete 泄露的 Access Key",
-          "使用临时凭证或服务端密管方案替代"
+          "AWS console → IAM → Users → Security credentials",
+          "Deactivate/Delete the leaked Access Key",
+          "Replace it with temporary credentials or a server-side secrets-management solution"
         ],
         "consolePath": "AWS IAM → Users → Security credentials",
         "estMinutes": 40
@@ -208,8 +208,8 @@
       "category": "secret-exposure",
       "severity": "MEDIUM",
       "matcherType": "regex",
-      "title": "Google API Key 泄露",
-      "description": "发现 Google API key（AIza 前缀）。未加限制的 key 可能被盗用产生费用。",
+      "title": "Google API Key leaked",
+      "description": "A Google API key (AIza prefix) was found. An unrestricted key may be abused to incur charges.",
       "confidence": 80,
       "payload": {
         "pattern": "AIza[0-9A-Za-z_\\-]{35}",
@@ -217,10 +217,10 @@
         "max": 2
       },
       "remediation": {
-        "summary": "为该 key 设置 HTTP referrer / API 限制或轮换。",
+        "summary": "Set HTTP referrer / API restrictions on the key, or rotate it.",
         "steps": [
           "Google Cloud Console → APIs & Services → Credentials",
-          "为 key 添加应用限制与 API 限制，或直接轮换"
+          "Add application and API restrictions to the key, or rotate it outright"
         ],
         "consolePath": "Google Cloud Console → Credentials",
         "estMinutes": 20
@@ -231,8 +231,8 @@
       "category": "secret-exposure",
       "severity": "HIGH",
       "matcherType": "regex",
-      "title": "GitHub Token 泄露",
-      "description": "发现 GitHub token（ghp_/gho_/ghu_/ghs_/ghr_ 前缀），可能被用于访问你的仓库。",
+      "title": "GitHub Token leaked",
+      "description": "A GitHub token (ghp_/gho_/ghu_/ghs_/ghr_ prefix) was found and may be used to access your repositories.",
       "confidence": 90,
       "payload": {
         "pattern": "gh[pousr]_[A-Za-z0-9]{36,}",
@@ -240,7 +240,7 @@
         "max": 2
       },
       "remediation": {
-        "summary": "在 GitHub 撤销该 token。",
+        "summary": "Revoke the token on GitHub.",
         "steps": ["GitHub → Settings → Developer settings → Tokens → Revoke"],
         "consolePath": "GitHub → Developer settings → Tokens",
         "estMinutes": 15
@@ -251,8 +251,8 @@
       "category": "secret-exposure",
       "severity": "CRITICAL",
       "matcherType": "regex",
-      "title": "私钥文件内容泄露",
-      "description": "发现 PEM 私钥块（-----BEGIN ... PRIVATE KEY-----）。私钥泄露可导致签名伪造、服务被冒充。",
+      "title": "Private key file contents leaked",
+      "description": "A PEM private key block (-----BEGIN ... PRIVATE KEY-----) was found. A leaked private key can enable signature forgery and service impersonation.",
       "confidence": 95,
       "payload": {
         "pattern": "-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----",
@@ -260,10 +260,10 @@
         "max": 1
       },
       "remediation": {
-        "summary": "立即轮换对应密钥对并从代码中移除私钥。",
+        "summary": "Immediately rotate the corresponding key pair and remove the private key from the code.",
         "steps": [
-          "生成新的密钥对并替换所有引用",
-          "从前端与仓库历史中彻底移除私钥"
+          "Generate a new key pair and replace all references",
+          "Thoroughly remove the private key from the frontend and from repository history"
         ],
         "consolePath": "",
         "estMinutes": 45
@@ -274,8 +274,8 @@
       "category": "secret-exposure",
       "severity": "MEDIUM",
       "matcherType": "regex",
-      "title": "疑似硬编码密码",
-      "description": "发现形如 password: \"...\" 的硬编码凭证。可能为数据库/第三方服务口令。",
+      "title": "Likely hardcoded password",
+      "description": "A hardcoded credential in the form password: \"...\" was found. It may be a database or third-party service password.",
       "confidence": 60,
       "payload": {
         "pattern": "(?:password|passwd|pwd|secret)\\s*[:=]\\s*['\"][^'\"\\s]{8,}['\"]",
@@ -284,8 +284,8 @@
         "max": 3
       },
       "remediation": {
-        "summary": "将口令迁移到服务端环境变量并轮换。",
-        "steps": ["移除硬编码口令", "改用环境变量并轮换泄露的口令"],
+        "summary": "Move the credential into server-side environment variables and rotate it.",
+        "steps": ["Remove the hardcoded credential", "Use environment variables instead and rotate the leaked credential"],
         "consolePath": "",
         "estMinutes": 25
       }
@@ -295,8 +295,8 @@
       "category": "exposure",
       "severity": "MEDIUM",
       "matcherType": "regex",
-      "title": "Firebase 配置暴露",
-      "description": "发现 Firebase 数据库地址。若 Firebase 安全规则配置为公开读写，将导致数据泄露。",
+      "title": "Firebase config exposure",
+      "description": "A Firebase database address was found. If the Firebase security rules are configured for public read/write, this will lead to a data leak.",
       "confidence": 75,
       "payload": {
         "pattern": "[a-z0-9-]+\\.firebaseio\\.com",
@@ -305,8 +305,8 @@
         "max": 1
       },
       "remediation": {
-        "summary": "检查 Firebase 安全规则，禁止匿名读写。",
-        "steps": ["Firebase 控制台 → Realtime Database/Firestore → Rules 收紧权限"],
+        "summary": "Review your Firebase security rules and disallow anonymous read/write.",
+        "steps": ["Firebase console → Realtime Database/Firestore → Rules: tighten permissions"],
         "consolePath": "Firebase Console → Rules",
         "estMinutes": 30
       }
@@ -316,8 +316,8 @@
       "category": "secret-exposure",
       "severity": "MEDIUM",
       "matcherType": "entropy",
-      "title": "疑似高熵密钥（兜底检测）",
-      "description": "发现高熵字符串，可能是未被规则精确匹配的密钥/令牌。作为兜底提示，请人工确认。",
+      "title": "Likely high-entropy secret (catch-all detection)",
+      "description": "A high-entropy string was found that may be a secret/token not precisely matched by a rule. This is a catch-all notice; please confirm manually.",
       "confidence": 45,
       "payload": {
         "minEntropy": 4.5,
@@ -327,8 +327,8 @@
         "max": 3
       },
       "remediation": {
-        "summary": "人工确认是否为密钥；若是则轮换并移出前端。",
-        "steps": ["确认该字符串用途", "如为密钥则轮换并迁移到服务端"],
+        "summary": "Manually confirm whether it's a secret; if so, rotate it and move it out of the frontend.",
+        "steps": ["Confirm what the string is used for", "If it's a secret, rotate it and move it server-side"],
         "consolePath": "",
         "estMinutes": 15
       }
@@ -338,8 +338,8 @@
       "category": "exposure",
       "severity": "LOW",
       "matcherType": "regex",
-      "title": "Source Map 暴露",
-      "description": "发现 sourceMappingURL，生产环境暴露 source map 会泄露原始源码，便于攻击者寻找漏洞与硬编码密钥。",
+      "title": "Source map exposure",
+      "description": "A sourceMappingURL was found. Exposing source maps in production leaks your original source code, making it easier for attackers to find vulnerabilities and hardcoded secrets.",
       "confidence": 85,
       "payload": {
         "pattern": "sourceMappingURL=[^\\s'\"]+\\.map",
@@ -348,10 +348,10 @@
         "max": 1
       },
       "remediation": {
-        "summary": "在构建配置中关闭生产环境 source map。",
+        "summary": "Disable production source maps in your build configuration.",
         "steps": [
-          "Vite：build.sourcemap = false",
-          "重新部署后确认 .map 不再对外可访问"
+          "Vite: build.sourcemap = false",
+          "After redeploying, confirm the .map files are no longer publicly accessible"
         ],
         "consolePath": "",
         "estMinutes": 10
@@ -362,8 +362,8 @@
       "category": "auth-config",
       "severity": "INFO",
       "matcherType": "http_probe",
-      "title": "Supabase Auth 配置可公开读取",
-      "description": "Supabase 的 /auth/v1/settings 端点可匿名读取，我们据此检查你的注册与邮箱确认配置。",
+      "title": "Supabase Auth config is publicly readable",
+      "description": "Supabase's /auth/v1/settings endpoint can be read anonymously; we use it to check your signup and email-confirmation configuration.",
       "confidence": 95,
       "payload": {
         "base": "supabase",
@@ -372,8 +372,8 @@
         "timeoutMs": 8000
       },
       "remediation": {
-        "summary": "无需处理，仅作为后续 Auth 配置检查的依据。",
-        "steps": ["无需操作"],
+        "summary": "No action needed; this only serves as the basis for subsequent Auth config checks.",
+        "steps": ["No action required"],
         "consolePath": "",
         "estMinutes": 0
       }
@@ -383,8 +383,8 @@
       "category": "auth-config",
       "severity": "LOW",
       "matcherType": "http_probe",
-      "title": "允许任意用户自助注册",
-      "description": "你的 Supabase Auth 未禁用自助注册（disable_signup=false）。若这不是产品预期（例如内部工具/邀请制），可能被批量注册滥用。",
+      "title": "Anyone can self-service sign up",
+      "description": "Your Supabase Auth has not disabled self-service signup (disable_signup=false). If this isn't what your product intends (e.g. an internal tool or invite-only), it may be abused for mass signups.",
       "confidence": 80,
       "payload": {
         "base": "supabase",
@@ -394,10 +394,10 @@
         "timeoutMs": 8000
       },
       "remediation": {
-        "summary": "如非公开产品，关闭自助注册或改为邀请制。",
+        "summary": "If this isn't a public product, disable self-service signup or switch to invite-only.",
         "steps": [
-          "Supabase 控制台 → Authentication → Providers/Settings",
-          "关闭 Allow new users to sign up（如适用）"
+          "Supabase console → Authentication → Providers/Settings",
+          "Turn off \"Allow new users to sign up\" (if applicable)"
         ],
         "consolePath": "Authentication → Settings",
         "estMinutes": 10
@@ -408,8 +408,8 @@
       "category": "auth-config",
       "severity": "MEDIUM",
       "matcherType": "http_probe",
-      "title": "邮箱确认被关闭（自动确认）",
-      "description": "检测到 mailer_autoconfirm=true，即用户无需验证邮箱即可激活账号。攻击者可用他人邮箱注册、伪造身份，也更易被批量滥用。",
+      "title": "Email confirmation disabled (auto-confirm)",
+      "description": "mailer_autoconfirm=true was detected, meaning users can activate accounts without verifying their email. Attackers can register using other people's email addresses and impersonate identities, and it's also more prone to mass abuse.",
       "confidence": 85,
       "payload": {
         "base": "supabase",
@@ -419,10 +419,10 @@
         "timeoutMs": 8000
       },
       "remediation": {
-        "summary": "开启邮箱确认（Confirm email）。",
+        "summary": "Enable email confirmation (Confirm email).",
         "steps": [
-          "Supabase 控制台 → Authentication → Providers → Email",
-          "开启 Confirm email"
+          "Supabase console → Authentication → Providers → Email",
+          "Enable Confirm email"
         ],
         "consolePath": "Authentication → Providers → Email",
         "estMinutes": 10

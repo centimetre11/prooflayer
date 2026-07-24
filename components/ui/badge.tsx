@@ -12,11 +12,11 @@ const severityStyles: Record<Severity, string> = {
 };
 
 const severityLabel: Record<Severity, string> = {
-  CRITICAL: "严重",
-  HIGH: "高危",
-  MEDIUM: "中危",
-  LOW: "低危",
-  INFO: "提示",
+  CRITICAL: "Critical",
+  HIGH: "High",
+  MEDIUM: "Medium",
+  LOW: "Low",
+  INFO: "Info",
 };
 
 export function Badge({

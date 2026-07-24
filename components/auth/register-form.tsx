@@ -29,7 +29,7 @@ export function RegisterForm() {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(data.error ?? "注册失败");
+        setError(data.error ?? "Registration failed");
         return;
       }
 
@@ -55,17 +55,17 @@ export function RegisterForm() {
         </p>
       ) : null}
       <div className="space-y-1.5">
-        <label className="text-xs text-[var(--color-muted)]">姓名</label>
+        <label className="text-xs text-[var(--color-muted)]">Name</label>
         <input
           name="name"
           required
           autoComplete="name"
-          placeholder="张三"
+          placeholder="Jane Doe"
           className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
         />
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs text-[var(--color-muted)]">邮箱</label>
+        <label className="text-xs text-[var(--color-muted)]">Email</label>
         <input
           name="email"
           type="email"
@@ -76,29 +76,29 @@ export function RegisterForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs text-[var(--color-muted)]">密码</label>
+        <label className="text-xs text-[var(--color-muted)]">Password</label>
         <input
           name="password"
           type="password"
           required
           minLength={8}
           autoComplete="new-password"
-          placeholder="至少 8 位"
+          placeholder="At least 8 characters"
           className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
         />
       </div>
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "创建中…" : "注册并进入控制台"}
+        {pending ? "Creating…" : "Sign up and open console"}
       </Button>
       <p className="text-center text-xs text-[var(--color-muted)]">
-        已有账号？{" "}
+        Already have an account?{" "}
         <Link href="/login" className="text-[var(--color-primary)] hover:underline">
-          去登录
+          Sign in
         </Link>
         {" · "}
-        只想收资讯？{" "}
+        Just want updates?{" "}
         <Link href="/#subscribe" className="text-[var(--color-primary)] hover:underline">
-          登记邮箱
+          Subscribe with email
         </Link>
       </p>
     </form>

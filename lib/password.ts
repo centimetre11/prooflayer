@@ -11,7 +11,7 @@ export async function verifyPassword(password: string, hash: string) {
 }
 
 export function validatePassword(password: string): string | null {
-  if (password.length < 8) return "密码至少 8 位";
-  if (password.length > 72) return "密码过长";
+  if (password.length < 8) return "Password must be at least 8 characters";
+  if (password.length > 72) return "Password is too long";
   return null;
 }

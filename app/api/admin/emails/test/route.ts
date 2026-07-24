@@ -19,13 +19,13 @@ export async function POST(req: Request) {
       userId: session.user.id,
       kind: "SYSTEM",
       force: true,
-      subject: "[麋鹿洞察] 后台测试邮件",
-      text: "这是一封来自运营后台的测试邮件。若你能看到它，说明邮件通道正常。",
+      subject: "[InsightElk] Admin test email",
+      text: "This is a test email from the admin console. If you can read it, your email pipeline is working correctly.",
       html: `
         <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
-          <h2 style="color:#0b1210">后台测试邮件</h2>
-          <p style="color:#444">这是一封来自运营后台的测试邮件。若你能看到它，说明邮件通道正常。</p>
-          <p style="color:#888;font-size:12px">操作者：${session.user.email ?? session.user.id}</p>
+          <h2 style="color:#0b1210">Admin test email</h2>
+          <p style="color:#444">This is a test email from the admin console. If you can read it, your email pipeline is working correctly.</p>
+          <p style="color:#888;font-size:12px">Triggered by: ${session.user.email ?? session.user.id}</p>
         </div>`,
     });
 
@@ -35,11 +35,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "邮箱无效" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid email" }, { status: 400 });
     }
     console.error("[admin/emails/test]", err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "发送失败" },
+      { error: err instanceof Error ? err.message : "Send failed" },
       { status: 500 }
     );
   }

@@ -40,9 +40,9 @@ export default async function AdminEmailsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">邮件系统</h2>
+        <h2 className="text-xl font-semibold">Email System</h2>
         <p className="text-sm text-[var(--color-muted)]">
-          投递日志、测试发送与周报触发
+          Delivery logs, test sends, and weekly digest triggers
         </p>
       </div>
 
@@ -61,7 +61,7 @@ export default async function AdminEmailsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>运维操作</CardTitle>
+          <CardTitle>Operations</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <SendTestEmail defaultTo={session.user.email ?? undefined} />
@@ -71,12 +71,12 @@ export default async function AdminEmailsPage() {
 
       <div className="space-y-3">
         <h3 className="text-sm font-medium text-[var(--color-muted)]">
-          最近 100 条投递
+          Last 100 deliveries
         </h3>
         {deliveries.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-sm text-[var(--color-muted)]">
-              还没有邮件投递记录。登录魔法链接或监测告警产生后会出现在这里。
+              No email delivery records yet. They will appear here once magic-link sign-ins or monitoring alerts are generated.
             </CardContent>
           </Card>
         ) : (
@@ -90,9 +90,9 @@ export default async function AdminEmailsPage() {
                     <Badge className={statusClass(d.status)}>{d.status}</Badge>
                   </div>
                   <p className="text-xs text-[var(--color-muted)]">
-                    至 {d.to}
+                    To {d.to}
                     {d.user?.email && d.user.email !== d.to
-                      ? ` · 用户 ${d.user.email}`
+                      ? ` · user ${d.user.email}`
                       : ""}
                     {d.providerId ? ` · provider ${d.providerId}` : ""}
                   </p>

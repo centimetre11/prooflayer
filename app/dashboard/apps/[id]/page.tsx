@@ -49,7 +49,7 @@ export default async function AppDetail({
         href="/dashboard"
         className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
       >
-        <ArrowLeft size={15} /> 返回控制台
+        <ArrowLeft size={15} /> Back to console
       </Link>
 
       {/* header */}
@@ -69,7 +69,7 @@ export default async function AppDetail({
           <MonitoringToggle appId={app.id} initial={app.monitoringEnabled} />
           <Button asChild variant="secondary" size="sm">
             <Link href={`/audit?url=${encodeURIComponent(app.url)}&from=${app.id}`}>
-              <DatabaseZap size={15} /> 深度审计
+              <DatabaseZap size={15} /> Deep audit
             </Link>
           </Button>
         </div>
@@ -82,7 +82,7 @@ export default async function AppDetail({
             <div className="text-3xl font-bold text-[var(--color-primary)]">
               {latest?.score ?? "—"}
             </div>
-            <div className="text-xs text-[var(--color-muted)]">最新评分</div>
+            <div className="text-xs text-[var(--color-muted)]">Latest score</div>
           </CardContent>
         </Card>
         <Card>
@@ -94,13 +94,13 @@ export default async function AppDetail({
             >
               {openAlerts.length}
             </div>
-            <div className="text-xs text-[var(--color-muted)]">待处理告警</div>
+            <div className="text-xs text-[var(--color-muted)]">Open alerts</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-3xl font-bold">{dossier?.evidenceCount ?? 0}</div>
-            <div className="text-xs text-[var(--color-muted)]">证据记录</div>
+            <div className="text-xs text-[var(--color-muted)]">Evidence records</div>
           </CardContent>
         </Card>
       </div>
@@ -108,12 +108,12 @@ export default async function AppDetail({
       {/* alerts */}
       <section className="mt-8">
         <h2 className="mb-3 text-lg font-semibold">
-          告警 <span className="text-[var(--color-muted)]">({openAlerts.length} 待处理)</span>
+          Alerts <span className="text-[var(--color-muted)]">({openAlerts.length} open)</span>
         </h2>
         {app.alerts.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center text-sm text-[var(--color-muted)]">
-              暂无告警。开启每日监测后，出现安全回退会第一时间通知你。
+              No alerts yet. Turn on daily monitoring and we&apos;ll notify you the moment a security regression appears.
             </CardContent>
           </Card>
         ) : (
@@ -139,11 +139,11 @@ export default async function AppDetail({
 
       {/* scan history timeline */}
       <section className="mt-8">
-        <h2 className="mb-3 text-lg font-semibold">体检历史时间轴</h2>
+        <h2 className="mb-3 text-lg font-semibold">Security check history timeline</h2>
         {app.scans.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center text-sm text-[var(--color-muted)]">
-              还没有完成的体检。
+              No completed security checks yet.
             </CardContent>
           </Card>
         ) : (
@@ -157,7 +157,7 @@ export default async function AppDetail({
                     </span>
                     <div>
                       <div className="text-sm font-medium">
-                        {kindLabel(s.kind)} · 评分 {s.score ?? "—"}
+                        {kindLabel(s.kind)} · Score {s.score ?? "—"}
                       </div>
                       <div className="text-xs text-[var(--color-muted)]">
                         {formatDate(s.createdAt)}
@@ -165,7 +165,7 @@ export default async function AppDetail({
                       </div>
                     </div>
                   </div>
-                  <Badge>查看报告</Badge>
+                  <Badge>View report</Badge>
                 </div>
               </Link>
             ))}
@@ -175,12 +175,12 @@ export default async function AppDetail({
 
       {/* compliance archive */}
       <section className="mt-8">
-        <h2 className="mb-3 text-lg font-semibold">合规档案 · 证据链</h2>
+        <h2 className="mb-3 text-lg font-semibold">Compliance Dossier · Evidence chain</h2>
         <Card>
           <CardContent className="space-y-4 p-5">
             <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
               <div className="text-[var(--color-muted)]">
-                监测连续性：约 {dossier?.monitoringDays ?? 0} 天 · 共 {dossier?.evidenceCount ?? 0} 条不可篡改记录
+                Monitoring continuity: ~{dossier?.monitoringDays ?? 0} days · {dossier?.evidenceCount ?? 0} tamper-proof records in total
               </div>
               <EvidenceVerify appId={app.id} />
             </div>
@@ -225,14 +225,14 @@ export default async function AppDetail({
 }
 
 function kindLabel(k: string) {
-  return k === "EXTERNAL" ? "外部体检" : k === "DEEP" ? "深度审计" : "监测扫描";
+  return k === "EXTERNAL" ? "External check" : k === "DEEP" ? "Deep audit" : "Monitoring scan";
 }
 function evidenceLabel(t: string) {
   return t === "BASELINE"
-    ? "安全基线快照"
+    ? "Security baseline snapshot"
     : t === "HEARTBEAT"
-      ? "监测心跳"
+      ? "Monitoring heartbeat"
       : t === "REMEDIATION"
-        ? "修复记录"
-        : "事故记录";
+        ? "Remediation record"
+        : "Incident record";
 }

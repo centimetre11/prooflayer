@@ -1,4 +1,4 @@
-/** 麋鹿洞察品牌标识：正面麋鹿头剪影 */
+/** InsightElk brand mark: front-facing elk head silhouette */
 export function BrandMark({
   size = 18,
   className,
@@ -35,5 +35,5 @@ export function BrandMark({
   );
 }
 
-export const BRAND_NAME = "麋鹿洞察";
+export const BRAND_NAME = "InsightElk";
 export const BRAND_NAME_EN = "InsightElk";

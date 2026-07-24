@@ -23,10 +23,10 @@ export function ScanForm({ size = "lg" }: { size?: "md" | "lg" }) {
         body: JSON.stringify({ url }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "扫描启动失败");
+      if (!res.ok) throw new Error(data.error ?? "Failed to start scan");
       router.push(`/scan/${data.scanId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "出错了");
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
     }
   }
@@ -42,7 +42,7 @@ export function ScanForm({ size = "lg" }: { size?: "md" | "lg" }) {
           <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="粘贴你的应用地址，如 myapp.lovable.app"
+            placeholder="Paste your app URL, e.g. myapp.lovable.app"
             className={`w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] pl-10 pr-4 text-[var(--color-foreground)] outline-none placeholder:text-[var(--color-muted)] focus:border-[var(--color-primary)] ${
               size === "lg" ? "h-12" : "h-10"
             }`}
@@ -51,16 +51,16 @@ export function ScanForm({ size = "lg" }: { size?: "md" | "lg" }) {
         <Button type="submit" size={size} disabled={loading} className="shrink-0">
           {loading ? (
             <>
-              <Loader2 size={18} className="animate-spin" /> 正在启动…
+              <Loader2 size={18} className="animate-spin" /> Starting…
             </>
           ) : (
-            "免费体检"
+            "Free security check"
           )}
         </Button>
       </div>
       {error && <p className="mt-2 text-sm text-[var(--color-critical)]">{error}</p>}
       <p className="mt-2 text-xs text-[var(--color-muted)]">
-        零注册即可跑第一扫 · 只读 · 我们不会改动你的任何东西
+        Run your first scan with zero signup · Read-only · We never change anything on your end
       </p>
     </form>
   );

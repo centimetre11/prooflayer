@@ -69,7 +69,7 @@ export async function POST(req: Request) {
       const detected = detectKind(secret);
       if (!detected) {
         return NextResponse.json(
-          { error: "没能识别粘贴的内容，请把 AI 助手返回的完整结果原样粘进来再试。" },
+          { error: "Couldn't recognize the pasted content. Please paste the full result your AI assistant returned, verbatim, and try again." },
           { status: 400 }
         );
       }

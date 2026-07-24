@@ -40,9 +40,9 @@ export async function PATCH(
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "参数无效" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
     console.error("[admin/applications]", err);
-    return NextResponse.json({ error: "服务器错误" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

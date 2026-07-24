@@ -23,9 +23,9 @@ export default async function AdminAppsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">应用</h2>
+        <h2 className="text-xl font-semibold">Applications</h2>
         <p className="text-sm text-[var(--color-muted)]">
-          全站应用与监测状态（最近 {apps.length} 条）
+          All apps and their monitoring status (latest {apps.length})
         </p>
       </div>
 
@@ -39,13 +39,13 @@ export default async function AdminAppsPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{app.name}</span>
                     {app.monitoringEnabled ? (
-                      <Badge className="text-[var(--color-accent)]">监测中</Badge>
+                      <Badge className="text-[var(--color-accent)]">Monitoring</Badge>
                     ) : (
-                      <Badge>监测关闭</Badge>
+                      <Badge>Monitoring off</Badge>
                     )}
                     {app._count.alerts > 0 ? (
                       <Badge className="text-[var(--color-critical)]">
-                        {app._count.alerts} 告警
+                        {app._count.alerts} alerts
                       </Badge>
                     ) : null}
                   </div>
@@ -53,8 +53,8 @@ export default async function AdminAppsPage() {
                     {app.url}
                   </p>
                   <p className="text-xs text-[var(--color-muted)]">
-                    归属 {app.user?.email ?? "匿名"} · 扫描 {app._count.scans} 次 ·
-                    最近评分 {last?.score ?? "—"} · 创建于{" "}
+                    Owner {app.user?.email ?? "Anonymous"} · {app._count.scans} scans ·
+                    latest score {last?.score ?? "—"} · created{" "}
                     {formatDate(app.createdAt)}
                   </p>
                 </div>
@@ -63,7 +63,7 @@ export default async function AdminAppsPage() {
                     href={`/dashboard/apps/${app.id}`}
                     className="text-sm text-[var(--color-primary)] hover:underline"
                   >
-                    查看控制台页
+                    View console page
                   </Link>
                 ) : null}
               </CardContent>

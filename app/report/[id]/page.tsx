@@ -61,12 +61,12 @@ export default async function ReportPage({
       {comparison && (
         <Card className="mb-6">
           <CardContent className="flex flex-wrap items-center gap-4 p-4 text-sm">
-            <span className="font-medium">复测对比（相较上次）：</span>
+            <span className="font-medium">Retest comparison (vs. last scan):</span>
             <span className="inline-flex items-center gap-1 text-[var(--color-accent)]">
-              <CheckCircle2 size={15} /> 已修复 {comparison.fixed} 项
+              <CheckCircle2 size={15} /> {comparison.fixed} fixed
             </span>
             <span className="inline-flex items-center gap-1 text-[var(--color-high)]">
-              <AlertTriangle size={15} /> 新增 {comparison.added} 项
+              <AlertTriangle size={15} /> {comparison.added} new
             </span>
           </CardContent>
         </Card>
@@ -92,18 +92,18 @@ export default async function ReportPage({
               <Bell size={20} />
             </span>
             <div>
-              <h3 className="font-semibold">修复后，让它一直保持安全</h3>
+              <h3 className="font-semibold">After you fix it, keep it secure for good</h3>
               <p className="text-sm text-[var(--color-muted)]">
-                开启每日监测：AI 重写代码导致 RLS 回退时第一时间告警，并沉淀为合规证据链。
+                Turn on daily monitoring: get an instant alert whenever AI-rewritten code causes an RLS regression, and build it into a compliance evidence chain.
               </p>
             </div>
           </div>
           <div className="flex gap-2">
             <Button asChild variant="secondary">
-              <Link href="/login">开启每日监测</Link>
+              <Link href="/login">Turn on daily monitoring</Link>
             </Button>
             <Button asChild>
-              <Link href="/pricing">查看方案</Link>
+              <Link href="/pricing">View plans</Link>
             </Button>
           </div>
         </CardContent>

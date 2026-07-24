@@ -22,14 +22,14 @@ export async function PATCH(
 
     if (body.role === "USER" && id === session.user.id) {
       return NextResponse.json(
-        { error: "不能把自己降为普通用户" },
+        { error: "You cannot demote yourself to a regular user" },
         { status: 400 }
       );
     }
 
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
-      return NextResponse.json({ error: "用户不存在" }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     if (body.role) {
@@ -59,9 +59,9 @@ export async function PATCH(
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: "参数无效" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
     console.error("[admin/users]", err);
-    return NextResponse.json({ error: "服务器错误" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

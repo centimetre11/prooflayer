@@ -13,7 +13,7 @@ export function ApplicationActions({ id }: { id: string }) {
     setError(null);
     let reason: string | undefined;
     if (action === "reject") {
-      reason = window.prompt("拒绝原因（可选，会写入邮件）") ?? undefined;
+      reason = window.prompt("Reason for rejection (optional, included in the email)") ?? undefined;
     }
     const res = await fetch(`/api/admin/applications/${id}`, {
       method: "PATCH",
@@ -22,7 +22,7 @@ export function ApplicationActions({ id }: { id: string }) {
     });
     if (!res.ok) {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
-      setError(data.error ?? "操作失败");
+      setError(data.error ?? "Action failed");
       return;
     }
     startTransition(() => router.refresh());
@@ -36,7 +36,7 @@ export function ApplicationActions({ id }: { id: string }) {
           disabled={pending}
           onClick={() => decide("approve")}
         >
-          通过
+          Approve
         </Button>
         <Button
           size="sm"
@@ -44,7 +44,7 @@ export function ApplicationActions({ id }: { id: string }) {
           disabled={pending}
           onClick={() => decide("reject")}
         >
-          拒绝
+          Reject
         </Button>
       </div>
       {error ? <p className="text-xs text-[var(--color-critical)]">{error}</p> : null}

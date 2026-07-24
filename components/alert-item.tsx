@@ -54,11 +54,11 @@ export function AlertItem({ alert }: { alert: AlertView }) {
         <div className="flex gap-2">
           {state === "OPEN" && (
             <Button variant="ghost" size="sm" onClick={() => act("ack")} disabled={busy}>
-              确认
+              Acknowledge
             </Button>
           )}
           <Button variant="secondary" size="sm" onClick={() => act("resolve")} disabled={busy}>
-            标记已解决
+            Mark resolved
           </Button>
         </div>
       )}
@@ -67,5 +67,5 @@ export function AlertItem({ alert }: { alert: AlertView }) {
 }
 
 function stateLabel(s: string) {
-  return s === "OPEN" ? "待处理" : s === "ACK" ? "已确认" : "已解决";
+  return s === "OPEN" ? "Open" : s === "ACK" ? "Acknowledged" : "Resolved";
 }

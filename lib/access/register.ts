@@ -11,7 +11,7 @@ export async function registerUser(input: {
   const name = input.name.trim();
   const passwordError = validatePassword(input.password);
   if (!email || !name) {
-    return { ok: false as const, code: "INVALID" as const, message: "请填写姓名和邮箱" };
+    return { ok: false as const, code: "INVALID" as const, message: "Please enter your name and email" };
   }
   if (passwordError) {
     return { ok: false as const, code: "WEAK_PASSWORD" as const, message: passwordError };
@@ -22,7 +22,7 @@ export async function registerUser(input: {
     return {
       ok: false as const,
       code: "EXISTS" as const,
-      message: "该邮箱已注册，请直接登录",
+      message: "This email is already registered. Please sign in instead.",
     };
   }
 
