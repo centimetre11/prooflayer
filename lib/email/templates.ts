@@ -17,6 +17,25 @@ export function magicLinkEmail(url: string): {
   };
 }
 
+export function passwordResetEmail(url: string): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  return {
+    subject: "Reset your InsightElk password",
+    text: `Reset your InsightElk password using this link (valid for 1 hour): ${url}\n\nIf you did not request this, you can ignore this email.`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
+        <h2 style="color:#0b1210">Reset your password</h2>
+        <p style="color:#444">We received a request to reset the password for your InsightElk console account. Click the button below to choose a new password. This link expires in 1 hour.</p>
+        <p><a href="${url}" style="display:inline-block;background:#d4a574;color:#1a140c;
+          padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Reset password</a></p>
+        <p style="color:#888;font-size:12px">If you did not request a password reset, you can safely ignore this email. Your password will stay the same.</p>
+      </div>`,
+  };
+}
+
 export function alertEmail(
   appName: string,
   items: { title: string; severity: string }[],

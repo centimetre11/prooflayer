@@ -47,7 +47,8 @@ export async function runMonitoringForApp(appId: string): Promise<AppMonitorResu
     await recordHeartbeat(app.id);
 
     // Alerts: only security regressions (newly-appeared high/critical) get opened.
-    const { opened, resolved } = await syncAlertsForApp(app.id, scan.id);
+    // Scoped to the EXTERNAL surface so deep alerts are left untouched.
+    const { opened, resolved } = await syncAlertsForApp(app.id, scan.id, "EXTERNAL");
 
     let notified = 0;
     if (opened.length > 0 && app.user?.email) {

@@ -63,11 +63,13 @@ export function AuditForm() {
       const res = await fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, kind: "auto", secret: pasted.trim() }),
+        body: JSON.stringify({ url, secret: pasted.trim() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Check failed, please try again");
-      router.push(`/report/${data.scanId}`);
+      // Land on the app page: findings + the continuous deep-monitoring setup,
+      // so the result is recorded and watched long-term rather than a one-off.
+      router.push(`/dashboard/apps/${data.appId}?deep=1`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
@@ -90,7 +92,8 @@ export function AuditForm() {
             Some risks hide inside your app where external scans can&rsquo;t reach. You don&rsquo;t need any
             technical knowledge — hand the instruction below to the AI you already use (Cursor / Claude
             Code / Codex, etc.). It figures out your backend, runs read-only checks, and gives you a
-            result to paste back. <b>Read-only throughout, and discarded right after use.</b>
+            result to paste back. We record it and then <b>keep watching for deeper regressions over time</b> —
+            read-only throughout.
           </CardDescription>
         </CardHeader>
         <CardContent>

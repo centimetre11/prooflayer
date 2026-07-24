@@ -17,6 +17,11 @@ export function LoginForm() {
         ? "Your account is not active. Please contact an administrator."
         : null
   );
+  const [notice] = useState<string | null>(
+    params.get("reset") === "1"
+      ? "Password updated. You can sign in with your new password."
+      : null
+  );
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -50,6 +55,11 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {notice ? (
+        <p className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-fg)]">
+          {notice}
+        </p>
+      ) : null}
       {error ? (
         <p className="rounded-lg border border-[color-mix(in_srgb,var(--color-critical)_40%,transparent)] bg-[color-mix(in_srgb,var(--color-critical)_10%,transparent)] px-3 py-2 text-sm text-[var(--color-critical)]">
           {error}
@@ -67,7 +77,15 @@ export function LoginForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs text-[var(--color-muted)]">Password</label>
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-xs text-[var(--color-muted)]">Password</label>
+          <Link
+            href="/forgot-password"
+            className="text-xs text-[var(--color-primary)] hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
         <input
           name="password"
           type="password"

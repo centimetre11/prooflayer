@@ -194,6 +194,12 @@ model App {
   projectRef        String? // supabase project ref, if detected/provided
   supabaseUrl       String?
   monitoringEnabled Boolean  @default(false)
+  // Layer 2 (deep) continuous monitoring: the user's AI agent re-runs our
+  // read-only prompt on a schedule and POSTs results to /api/ingest/<token>.
+  // We never hold a live DB connection; the token authenticates the drop-off.
+  deepMonitoringEnabled Boolean  @default(false)
+  ingestToken           String?  @unique
+  lastIngestAt          DateTime?
   lastScanAt        DateTime?
   createdAt         DateTime @default(now())
 
@@ -271,6 +277,10 @@ model Rule {
 model Alert {
   id             String     @id @default(cuid())
   appId          String
+  // Which surface produced this alert. Keeps external (zero-touch) monitoring
+  // and deep (AI-collected) monitoring from resolving each other's alerts, since
+  // each cycle only ever sees findings from its own surface.
+  surface        String     @default("EXTERNAL") // EXTERNAL | DEEP
   ruleId         String
   fingerprint    String
   severity       Severity

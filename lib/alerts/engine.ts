@@ -10,18 +10,25 @@ const HIGH_PRIORITY: Severity[] = ["CRITICAL", "HIGH"];
  * - Auto-resolves open alerts whose finding disappeared (treated as fixed),
  *   writing a remediation record into the evidence chain.
  * Returns the alerts that were newly opened (candidates for notification).
+ *
+ * `surface` scopes reconciliation to a single detection surface (EXTERNAL vs
+ * DEEP). A deep re-check only ever sees deep findings, so it must not resolve
+ * external alerts (and vice versa) — otherwise each cycle would wipe out the
+ * other surface's open alerts.
  */
 export async function syncAlertsForApp(
   appId: string,
-  scanId: string
+  scanId: string,
+  surface: "EXTERNAL" | "DEEP" = "EXTERNAL"
 ): Promise<{ opened: Alert[]; resolved: Alert[] }> {
   const findings = await prisma.scanFinding.findMany({ where: { scanId } });
   const highPriority = findings.filter((f) => HIGH_PRIORITY.includes(f.severity));
   const currentFps = new Set(highPriority.map((f) => f.fingerprint));
 
-  // Active = not yet resolved (OPEN or ACK). Used for both de-dupe and resolution.
+  // Active = not yet resolved (OPEN or ACK) on THIS surface. Used for de-dupe
+  // and resolution.
   const activeAlerts = await prisma.alert.findMany({
-    where: { appId, state: { in: ["OPEN", "ACK"] } },
+    where: { appId, surface, state: { in: ["OPEN", "ACK"] } },
   });
   const activeByFp = new Map(activeAlerts.map((a) => [a.fingerprint, a]));
 
@@ -31,6 +38,7 @@ export async function syncAlertsForApp(
     const alert = await prisma.alert.create({
       data: {
         appId,
+        surface,
         ruleId: f.ruleId,
         fingerprint: f.fingerprint,
         severity: f.severity,

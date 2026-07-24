@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MonitoringToggle } from "@/components/monitoring-toggle";
+import { DeepMonitorSetup } from "@/components/deep-monitor-setup";
 import { AppManage } from "@/components/app-manage";
 import { AlertItem, type AlertView } from "@/components/alert-item";
 import { EvidenceVerify } from "@/components/evidence-verify";
@@ -21,11 +22,14 @@ export const dynamic = "force-dynamic";
 
 export default async function AppDetail({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ deep?: string }>;
 }) {
   const session = await requireActiveUser();
   const { id } = await params;
+  const { deep } = await searchParams;
 
   const app = await prisma.app.findFirst({
     where: { id, userId: session.user.id },
@@ -43,6 +47,9 @@ export default async function AppDetail({
 
   const openAlerts = app.alerts.filter((a) => a.state !== "RESOLVED");
   const latest = app.scans[0];
+
+  const base = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const ingestUrl = app.ingestToken ? `${base}/api/ingest/${app.ingestToken}` : null;
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10">
@@ -118,6 +125,18 @@ export default async function AppDetail({
             </p>
           </CardContent>
         </Card>
+      </section>
+
+      {/* continuous deep monitoring */}
+      <section className="mt-8">
+        <h2 className="mb-3 text-lg font-semibold">Deeper checks · continuous</h2>
+        <DeepMonitorSetup
+          appId={app.id}
+          initialEnabled={app.deepMonitoringEnabled}
+          initialIngestUrl={ingestUrl}
+          lastIngestAt={app.lastIngestAt ? formatDate(app.lastIngestAt) : null}
+          highlight={deep === "1"}
+        />
       </section>
 
       {/* alerts */}
