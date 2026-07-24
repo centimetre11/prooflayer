@@ -30,7 +30,8 @@ function tryParsePgEnvelope(
   if (!t.startsWith("{")) return null;
   try {
     const o = JSON.parse(t);
-    if (o && typeof o === "object" && typeof o.prooflayer === "string" && o.prooflayer.startsWith("pg-audit")) {
+    const tag = o?.insightelk ?? o?.prooflayer;
+    if (o && typeof o === "object" && typeof tag === "string" && tag.startsWith("pg-audit")) {
       return o;
     }
   } catch {

@@ -6,7 +6,7 @@ import {
   FileClock,
   Bell,
   KeyRound,
-  DatabaseZap,
+  Sparkles,
   ScanLine,
   ArrowRight,
   Mail,
@@ -50,25 +50,22 @@ export default function Home() {
       {/* How it works */}
       <section id="how" className="border-t border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface)_40%,transparent)] py-16">
         <div className="mx-auto max-w-6xl px-5">
-          <h2 className="text-center text-2xl font-semibold sm:text-3xl">Three steps—no engineer required</h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
+          <h2 className="text-center text-2xl font-semibold sm:text-3xl">Two layers—no engineer required</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-[var(--color-muted)]">
+            Layer 1 needs nothing but a URL. Layer 2 is anything deeper—and your AI does it for you.
+          </p>
+          <div className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-2">
             <Step
               n={1}
               icon={<ScanLine size={20} />}
               title="Paste your app URL"
-              desc="We render your app in a real browser on the backend, capture the frontend bundle and runtime requests, and detect exposed database keys. No sign-up required."
+              desc="We render your app in a real browser, capture the frontend bundle and runtime requests, and detect exposed database keys. Instant, free, no sign-up—and you get a plain-English report with three numbers: total risks / your most critical issue / minutes to fix."
             />
             <Step
               n={2}
-              icon={<DatabaseZap size={20} />}
-              title="Optionally connect Supabase"
-              desc="Paste read-only credentials for a deep RLS audit. Strictly read-only—we never change anything, and credentials are wiped after use by default."
-            />
-            <Step
-              n={3}
-              icon={<FileClock size={20} />}
-              title="Get a plain-English report + dossier"
-              desc="Three numbers up top: total risks / your most critical issue / estimated minutes to fix. Every scan is preserved as tamper-proof compliance evidence."
+              icon={<Sparkles size={20} />}
+              title="Let your AI go deeper"
+              desc="Hand one instruction to the AI you already use (Cursor / Claude Code / Codex). It figures out your backend, runs read-only checks (RLS, permissions, Firestore rules) wherever it can reach them, and hands you a result to paste back. Every check becomes tamper-proof compliance evidence."
             />
           </div>
         </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Share2, DatabaseZap, Check, Copy } from "lucide-react";
+import { RefreshCw, Share2, Sparkles, Check, Copy } from "lucide-react";
 
 export function ReportActions({
   scanId,
@@ -61,7 +61,7 @@ export function ReportActions({
         </Button>
         <Button asChild size="sm">
           <Link href={`/audit?url=${encodeURIComponent(url)}&from=${scanId}`}>
-            <DatabaseZap size={15} /> Deep RLS audit
+            <Sparkles size={15} /> Let your AI go deeper
           </Link>
         </Button>
       </div>
