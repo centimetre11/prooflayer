@@ -10,7 +10,7 @@ while Nginx + Certbot are installed on the host to handle reverse proxying and T
 | Server directory | `/opt/<app-name>`, default `/opt/prooflayer` |
 | `.env` | **Server-only**, random secrets auto-generated on first deploy, never committed to Git (`.gitignore` already ignores `.env*`) |
 | Release method | Pushing to `main` does **not** auto-deploy; you must run `scripts/deploy.sh` locally |
-| Reverse proxy | Host Nginx → `127.0.0.1:3000` (the container only listens on loopback) |
+| Reverse proxy | Host Nginx → `127.0.0.1:3001` (the container only listens on loopback; 3000/3100 are used by other apps on this box) |
 | TLS | Certbot (Let's Encrypt); the domain must already resolve to the server IP |
 
 ## Prerequisites

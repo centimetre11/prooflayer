@@ -29,7 +29,7 @@ set -euo pipefail
 # ---- defaults -------------------------------------------------------------
 APP_NAME="prooflayer"
 APP_DIR=""                         # defaults to /opt/$APP_NAME
-APP_PORT="3000"                    # host loopback port Nginx proxies to
+APP_PORT="3001"                    # host loopback port Nginx proxies to (3000/3100 taken by other apps on this box)
 STRATEGY="git"
 BRANCH="main"
 REPO_URL="https://github.com/centimetre11/prooflayer.git"
